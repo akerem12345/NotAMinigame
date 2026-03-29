@@ -17,10 +17,12 @@ public class User {
     private Long id;
 
     @NotEmpty
+    @Column(unique = true)
     private String username;
 
     @Email
     @NotEmpty
+    @Column(unique = true)
     private String email;
 
     @NotEmpty
