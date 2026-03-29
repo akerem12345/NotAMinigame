@@ -1,12 +1,16 @@
-package entities;
+package com.akionur.notmini.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import java.time.LocalDateTime;
+
 import java.util.Map;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "scores")
 public class Score {
