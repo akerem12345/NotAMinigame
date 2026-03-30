@@ -414,3 +414,105 @@ body {
   color: var(--secondary-neon);
   text-decoration: underline;
 }
+
+/* Splash Screen */
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-gradient);
+  z-index: 1000;
+  animation: fadeOutSplash 0.5s ease-in 2.5s forwards;
+}
+
+.splash-logo {
+  width: 15rem;
+  height: 15rem;
+  animation: pulseNeon 1s infinite alternate, popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.splash-title {
+  margin-top: 2rem;
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  background: linear-gradient(to right, var(--secondary-neon), var(--primary-neon));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(188, 19, 254, 0.5));
+  animation: fadeIn 1s ease-out 0.5s both;
+}
+
+/* Gateway specific */
+.gateway-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.gateway-guest-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.gateway-guest-divider::before,
+.gateway-guest-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.gateway-guest-divider:not(:empty)::before {
+  margin-right: .5em;
+}
+
+.gateway-guest-divider:not(:empty)::after {
+  margin-left: .5em;
+}
+
+.guest-btn {
+  width: 100%;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--secondary-neon);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.guest-btn:hover {
+  background: rgba(0, 240, 255, 0.1);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+@keyframes pulseNeon {
+  from { filter: drop-shadow(0 0 15px var(--secondary-neon)); transform: scale(1); }
+  to { filter: drop-shadow(0 0 35px var(--primary-neon)); transform: scale(1.05); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOutSplash {
+  from { opacity: 1; pointer-events: auto; }
+  to { opacity: 0; pointer-events: none; visibility: hidden; }
+}
