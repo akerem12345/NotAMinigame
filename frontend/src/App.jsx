@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './index.css';
 
 const GameCard = ({ icon, title, desc, onPlay }) => {
@@ -13,6 +13,11 @@ const GameCard = ({ icon, title, desc, onPlay }) => {
 };
 
 function App() {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+
   const games = [
     {
       id: 1,
@@ -46,6 +51,86 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Top Right Auth Button */}
+      <div className="auth-btn-container">
+        <button className="auth-btn" onClick={() => setShowAuthModal(true)}>
+          Login / Register
+        </button>
+      </div>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <div className="modal-overlay" onClick={() => setShowAuthModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={() => setShowAuthModal(false)}>✕</button>
+            <h2>{isLogin ? 'Welcome Back' : 'Join NotAMinigame'}</h2>
+            
+            <form className="auth-form" onSubmit={(e) => { e.preventDefault(); alert("Auth logic will be connected later!"); }}>
+              <div className="input-group">
+                <label>Email</label>
+                <input type="email" placeholder="Enter your email" required />
+              </div>
+              <div className="input-group password-group">
+                <label>Password</label>
+                <div className="password-input-wrapper">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="Enter your password" 
+                    required
+                  />
+                  <button 
+                    type="button" 
+                    className="eye-btn" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
+                {isLogin && (
+                  <div className="forgot-password">
+                    <span onClick={() => setShowForgotPasswordModal(true)}>Forgot password?</span>
+                  </div>
+                )}
+              </div>
+              <button className="submit-btn" type="submit">
+                {isLogin ? 'Login' : 'Register'}
+              </button>
+            </form>
+            
+            <p className="auth-switch">
+              {isLogin ? "Don't have an account? " : "Already have an account? "}
+              <span onClick={() => setIsLogin(!isLogin)}>
+                {isLogin ? 'Register' : 'Login'}
+              </span>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Forgot Password Modal */}
+      {showForgotPasswordModal && (
+        <div className="modal-overlay" onClick={() => setShowForgotPasswordModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={() => setShowForgotPasswordModal(false)}>✕</button>
+            <h2>Reset Password</h2>
+            <p className="tagline" style={{ textAlign: 'center', marginBottom: '1.5rem', fontSize: '1rem' }}>
+              Enter your email to receive a password reset link.
+            </p>
+            
+            <form className="auth-form" onSubmit={(e) => { e.preventDefault(); alert("Geçici simülasyon: Şifre sıfırlama linki e-postanıza gönderildi!"); setShowForgotPasswordModal(false); }}>
+              <div className="input-group">
+                <label>Email</label>
+                <input type="email" placeholder="Enter your email" required />
+              </div>
+              <button className="submit-btn" type="submit" style={{ marginTop: '1rem' }}>
+                Send Reset Link
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="header">
         <h1 className="logo-text">NotAMinigame</h1>
