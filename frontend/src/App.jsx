@@ -122,8 +122,78 @@ const Gateway = ({ onLogin, onGuest }) => {
   );
 };
 
+// --- View 4: Profile Screen Component ---
+const ProfileScreen = ({ onBack }) => {
+  const [avatarColor, setAvatarColor] = useState('#bc13fe');
+  const [bannerColor1, setBannerColor1] = useState('#bc13fe');
+  const [bannerColor2, setBannerColor2] = useState('#00f0ff');
+  const colorInputRef = React.useRef(null);
+
+  return (
+    <div className="profile-container">
+      <button className="back-btn" onClick={onBack}>←</button>
+      <div className="profile-card">
+        <div 
+          className="profile-banner"
+          style={{ background: `linear-gradient(135deg, ${bannerColor1}, ${bannerColor2})` }}
+        >
+          <div className="banner-color-picker">
+            <span className="banner-color-label">Color 1</span>
+            <div className="banner-color-btn" style={{ backgroundColor: bannerColor1 }} title="Choose Banner Color 1">
+              <input 
+                type="color" 
+                value={bannerColor1} 
+                onChange={(e) => setBannerColor1(e.target.value)} 
+              />
+            </div>
+          </div>
+          <div className="banner-color-picker">
+            <div className="banner-color-btn" style={{ backgroundColor: bannerColor2 }} title="Choose Banner Color 2">
+              <input 
+                type="color" 
+                value={bannerColor2} 
+                onChange={(e) => setBannerColor2(e.target.value)} 
+              />
+            </div>
+            <span className="banner-color-label">Color 2</span>
+          </div>
+        </div>
+        <div 
+          className="profile-avatar" 
+          style={{ 
+            backgroundColor: avatarColor, 
+            boxShadow: `0 0 20px ${avatarColor}80`,
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+          title="Change Avatar Color"
+        >
+          <input 
+            type="color"
+            value={avatarColor}
+            onChange={(e) => setAvatarColor(e.target.value)}
+            style={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              opacity: 0,
+              cursor: 'pointer',
+              border: 'none',
+              padding: 0
+            }}
+          />
+        </div>
+        <h3 className="profile-username">PlayerOne</h3>
+        <div className="profile-score">Score: <span style={{ opacity: 0.5 }}>null</span></div>
+      </div>
+    </div>
+  );
+};
+
 // --- View 3: Main Menu Component ---
-const MainMenu = () => {
+const MainMenu = ({ onProfile }) => {
   const games = [
     {
       id: 1,
@@ -157,6 +227,9 @@ const MainMenu = () => {
 
   return (
     <div className="app-container">
+      <div className="header-actions">
+        <button className="profile-btn" onClick={onProfile}>👤 Profile</button>
+      </div>
       <header className="header">
         <h1 className="logo-text">NotAMinigame</h1>
         <p className="tagline">Select a mini-game to begin</p>
@@ -185,14 +258,15 @@ const MainMenu = () => {
 
 // --- Main App Controller ---
 function App() {
-  // State handles application navigation: 'splash', 'gateway', 'menu'
+  // State handles application navigation: 'splash', 'gateway', 'menu', 'profile'
   const [view, setView] = useState('splash');
 
   return (
     <>
       {view === 'splash' && <SplashScreen onComplete={() => setView('gateway')} />}
       {view === 'gateway' && <Gateway onLogin={() => setView('menu')} onGuest={() => setView('menu')} />}
-      {view === 'menu' && <MainMenu />}
+      {view === 'menu' && <MainMenu onProfile={() => setView('profile')} />}
+      {view === 'profile' && <ProfileScreen onBack={() => setView('menu')} />}
     </>
   );
 }
