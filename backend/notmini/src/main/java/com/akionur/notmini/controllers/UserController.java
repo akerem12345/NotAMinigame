@@ -11,6 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.akionur.notmini.repositories.UserRepository;
+import com.akionur.notmini.repositories.PasswordResetTokenRepository;
+import com.akionur.notmini.entities.PasswordResetToken;
+import com.akionur.notmini.services.EmailService;
+import java.util.Date;
+import java.util.UUID;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,11 +30,21 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private PasswordResetTokenRepository tokenRepository;
+
+    @Autowired
+    private EmailService emailService;
+
     // Register
     @PostMapping("/register")
-    public ResponseEntity<UserLightDto> register(@RequestBody @Valid User user) {
+    public ResponseEntity<?> register(@RequestBody @Valid User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            return ResponseEntity.status(409).build();
+            return ResponseEntity.status(409).body(java.util.Map.of("message", "Bu e-posta adresi zaten kullanımda."));
+        }
+        if (userRepository.existsByUsername(user.getUsername())) {
+            return ResponseEntity.status(409).body(java.util.Map.of("message", "Bu kullanıcı adı zaten alınmış. Lütfen başka belirleyin."));
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User saved = userRepository.save(user);
@@ -37,12 +53,11 @@ public class UserController {
 
     // Login
     @PostMapping("/login")
-    public ResponseEntity<java.util.Map<String, String>> login(@RequestBody @Valid UserLoginDto dto) {
-        User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+    public ResponseEntity<?> login(@RequestBody @Valid UserLoginDto dto) {
+        User user = userRepository.findByEmail(dto.getEmail()).orElse(null);
 
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(401).build();
+        if (user == null || !passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(401).body(java.util.Map.of("message", "E-posta veya şifre hatalı."));
         }
 
         String token = jwtUtil.generateToken(user.getEmail());
@@ -111,5 +126,65 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
         userRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Forgot Password
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody @Valid com.akionur.notmini.dto.ForgotPasswordDto dto) {
+        String email = dto.getEmail();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            
+            // Delete previous tokens for this user
+            tokenRepository.deleteByUser(user);
+
+            // Generate new token
+            String token = UUID.randomUUID().toString();
+            Date expiryDate = new Date(System.currentTimeMillis() + 1000 * 60 * 20); // 20 minutes
+            
+            PasswordResetToken resetToken = new PasswordResetToken(token, user, expiryDate);
+            tokenRepository.save(resetToken);
+
+            // Send Email
+            emailService.sendPasswordResetEmail(user.getEmail(), user.getUsername(), token);
+
+            return ResponseEntity.ok(java.util.Map.of("message", "Şifre sıfırlama e-postası gönderildi."));
+        } else {
+            // Do not reveal if email exists or not for security reasons, just return ok
+            return ResponseEntity.ok(java.util.Map.of("message", "Eğer e-posta sistemde kayıtlıysa, şifre sıfırlama bağlantısı gönderilmiştir."));
+        }
+    }
+
+    // Reset Password
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid com.akionur.notmini.dto.ResetPasswordDto dto) {
+        String token = dto.getToken();
+        String newPassword = dto.getNewPassword();
+
+        Optional<PasswordResetToken> tokenOptional = tokenRepository.findByToken(token);
+
+        if (tokenOptional.isEmpty()) {
+            // Fırlatalım Exception ki GlobalExceptionHandler yakalasın veya direkt manuel dönelim
+            throw new RuntimeException("Geçersiz veya süresi dolmuş token.");
+        }
+
+        PasswordResetToken resetToken = tokenOptional.get();
+
+        if (resetToken.getExpiryDate().before(new Date())) {
+            tokenRepository.delete(resetToken);
+            throw new RuntimeException("Token süresi dolmuş.");
+        }
+
+        // Update password
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // Discard token
+        tokenRepository.delete(resetToken);
+
+        return ResponseEntity.ok(java.util.Map.of("message", "Şifreniz başarıyla güncellendi."));
     }
 }

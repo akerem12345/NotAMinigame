@@ -1,19 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import './index.css';
+import { apiFetch } from './api';
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('');
+  
+  const token = new URLSearchParams(window.location.search).get('token');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!token) {
+        setStatusMsg("Hata: Token bulunamadı. Lütfen e-postanızdaki bağlantıyı kullanın.");
+        return;
+    }
     if (newPassword !== confirmPassword) {
-      alert("Şifreler eşleşmiyor! (Passwords do not match)");
+      setStatusMsg("Şifreler eşleşmiyor! (Passwords do not match)");
       return;
     }
-    alert(`Şifre başariyla yenilendi!\nYeni Şifre: ${newPassword}`);
-    window.location.href = '/';
+    
+    setStatusMsg("Şifre güncelleniyor...");
+    try {
+        const res = await apiFetch('/users/reset-password', {
+            method: 'POST',
+            body: JSON.stringify({ token, newPassword })
+        });
+        setStatusMsg(res.message || "Şifreniz başarıyla yenilendi! Giriş yapabilirsiniz.");
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 2000);
+    } catch(err) {
+        setStatusMsg("Hata: " + err.message);
+    }
   };
 
   return (
@@ -24,6 +44,13 @@ const ResetPassword = () => {
           Lütfen yeni şifrenizi girin.
         </p>
 
+        {statusMsg && <div style={{color: '#bc13fe', marginBottom: '15px', textAlign: 'center', fontSize: '0.9rem'}}>{statusMsg}</div>}
+
+        {!token && (
+            <div style={{color: 'red', textAlign: 'center', marginBottom: '15px'}}>Geçersiz veya eksik token. Lütfen mailinizdeki bağlantıya tıklayın.</div>
+        )}
+
+        {token && (
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="input-group password-group">
             <label>Yeni Şifre</label>
@@ -63,6 +90,7 @@ const ResetPassword = () => {
             Şifreyi Güncelle
           </button>
         </form>
+        )}
 
         <p className="auth-switch" style={{ marginTop: '2rem' }}>
           <span onClick={() => window.location.href = '/'}>

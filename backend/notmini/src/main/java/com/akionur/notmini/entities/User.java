@@ -30,5 +30,7 @@ public class User {
 
     private String pphex;
 
-    private String bannerhex;
+    private String bannerhex_1;
+
+    private String bannerhex_2;
 }

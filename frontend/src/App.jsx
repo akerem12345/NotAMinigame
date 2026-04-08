@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './index.css';
+import { apiFetch } from './api';
 
 const GameCard = ({ icon, title, desc, onPlay }) => {
   return (
@@ -15,7 +16,7 @@ const GameCard = ({ icon, title, desc, onPlay }) => {
 // --- View 1: Splash Screen Component ---
 const SplashScreen = ({ onComplete }) => {
   useEffect(() => {
-    // Transition to the gateway after 2.5 seconds
+    // Transition to the next screen after 2.5 seconds
     const timer = setTimeout(() => {
       onComplete();
     }, 2500);
@@ -31,24 +32,67 @@ const SplashScreen = ({ onComplete }) => {
 };
 
 // --- View 2: Gateway / Auth Screen Component ---
-const Gateway = ({ onLogin, onGuest }) => {
+const Gateway = ({ onAuthSuccess, onGuest }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [forgotPasswordStatus, setForgotPasswordStatus] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    try {
+      if (isLogin) {
+        const { token } = await apiFetch('/users/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+        localStorage.setItem('jwt_token', token);
+      } else {
+        await apiFetch('/users/register', {
+          method: 'POST',
+          body: JSON.stringify({ username, email, password })
+        });
+        // Auto login after register
+        const { token } = await apiFetch('/users/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+        localStorage.setItem('jwt_token', token);
+      }
+      
+      // Fetch user profile after getting token
+      const profile = await apiFetch('/users/me');
+      onAuthSuccess(profile);
+
+    } catch (error) {
+      setAuthError(error.message);
+    }
+  };
 
   return (
     <div className="gateway-container">
       <div className="modal-content" style={{ animation: 'none' }}>
         <h2>{isLogin ? 'Welcome Back' : 'Join NotAMinigame'}</h2>
+
+        {authError && <div className="auth-error" style={{color: '#ff3366', background: 'rgba(255,51,102,0.1)', padding: '10px', borderRadius: '8px', marginBottom: '15px', textAlign: 'center', fontSize: '0.9rem', border: '1px solid #ff3366'}}>{authError}</div>}
         
-        <form className="auth-form" onSubmit={(e) => { 
-            e.preventDefault(); 
-            // Mock authentication success
-            onLogin(); 
-        }}>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          {!isLogin && (
+             <div className="input-group">
+                <label>Username</label>
+                <input type="text" placeholder="Enter your username" required value={username} onChange={e => setUsername(e.target.value)} />
+             </div>
+          )}
           <div className="input-group">
             <label>Email</label>
-            <input type="email" placeholder="Enter your email" required />
+            <input type="email" placeholder="Enter your email" required value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           <div className="input-group password-group">
             <label>Password</label>
@@ -57,6 +101,8 @@ const Gateway = ({ onLogin, onGuest }) => {
                 type={showPassword ? "text" : "password"} 
                 placeholder="Enter your password" 
                 required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
               />
               <button 
                 type="button" 
@@ -92,7 +138,7 @@ const Gateway = ({ onLogin, onGuest }) => {
         </p>
       </div>
 
-      {/* Forgot Password Modal (Still pop-up inside Gateway) */}
+      {/* Forgot Password Modal */}
       {showForgotPasswordModal && (
         <div className="modal-overlay" onClick={() => setShowForgotPasswordModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -102,14 +148,23 @@ const Gateway = ({ onLogin, onGuest }) => {
               Enter your email to receive a password reset link.
             </p>
             
-            <form className="auth-form" onSubmit={(e) => { 
+            <form className="auth-form" onSubmit={async (e) => { 
                 e.preventDefault(); 
-                alert("Şifre sıfırlama e-postası gönderildi (Simülasyon)!"); 
-                setShowForgotPasswordModal(false); 
+                setForgotPasswordStatus('Gönderiliyor...');
+                try {
+                  const res = await apiFetch('/users/forgot-password', {
+                    method: 'POST',
+                    body: JSON.stringify({ email: forgotPasswordEmail })
+                  });
+                  setForgotPasswordStatus(res.message || "Şifre sıfırlama e-postası e-posta adresinize gönderildi!");
+                } catch(err) {
+                  setForgotPasswordStatus("Hata: " + err.message);
+                }
             }}>
+              {forgotPasswordStatus && <div style={{color: '#bc13fe', marginBottom: '10px', fontSize: '0.9rem'}}>{forgotPasswordStatus}</div>}
               <div className="input-group">
                 <label>Email</label>
-                <input type="email" placeholder="Enter your email" required />
+                <input type="email" placeholder="Enter your email" required value={forgotPasswordEmail} onChange={e => setForgotPasswordEmail(e.target.value)} />
               </div>
               <button className="submit-btn" type="submit" style={{ marginTop: '1rem' }}>
                 Send Reset Link
@@ -123,15 +178,33 @@ const Gateway = ({ onLogin, onGuest }) => {
 };
 
 // --- View 4: Profile Screen Component ---
-const ProfileScreen = ({ onBack }) => {
-  const [avatarColor, setAvatarColor] = useState('#bc13fe');
-  const [bannerColor1, setBannerColor1] = useState('#bc13fe');
-  const [bannerColor2, setBannerColor2] = useState('#00f0ff');
-  const colorInputRef = React.useRef(null);
+const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
+  const [avatarColor, setAvatarColor] = useState(user?.pphex || '#bc13fe');
+  const [bannerColor1, setBannerColor1] = useState(user?.bannerhex_1 || '#bc13fe');
+  const [bannerColor2, setBannerColor2] = useState(user?.bannerhex_2 || '#00f0ff');
+
+  const handleBack = async () => {
+    if (user && user.id) {
+        try {
+            const updatedProfile = await apiFetch(`/users/${user.id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    pphex: avatarColor,
+                    bannerhex_1: bannerColor1,
+                    bannerhex_2: bannerColor2
+                })
+            });
+            onUserUpdate(updatedProfile);
+        } catch(e) {
+            console.error("Failed to save colors", e);
+        }
+    }
+    onBack();
+  };
 
   return (
     <div className="profile-container">
-      <button className="back-btn" onClick={onBack}>←</button>
+      <button className="back-btn" onClick={handleBack}>←</button>
       <div className="profile-card">
         <div 
           className="profile-banner"
@@ -185,7 +258,7 @@ const ProfileScreen = ({ onBack }) => {
             }}
           />
         </div>
-        <h3 className="profile-username">PlayerOne</h3>
+        <h3 className="profile-username">{user?.username || 'Guest'}</h3>
         <div className="profile-score">Score: <span style={{ opacity: 0.5 }}>null</span></div>
       </div>
     </div>
@@ -193,7 +266,7 @@ const ProfileScreen = ({ onBack }) => {
 };
 
 // --- View 3: Main Menu Component ---
-const MainMenu = ({ onProfile }) => {
+const MainMenu = ({ user, onProfile, onLogout }) => {
   const games = [
     {
       id: 1,
@@ -228,11 +301,18 @@ const MainMenu = ({ onProfile }) => {
   return (
     <div className="app-container">
       <div className="header-actions">
-        <button className="profile-btn" onClick={onProfile}>👤 Profile</button>
+        {user ? (
+          <>
+            <button className="auth-btn" onClick={onLogout} style={{marginRight: '10px'}}>Logout</button>
+            <button className="profile-btn" onClick={onProfile}>👤 Profile</button>
+          </>
+        ) : (
+          <button className="auth-btn" onClick={onLogout}>Login / Register</button>
+        )}
       </div>
       <header className="header">
         <h1 className="logo-text">NotAMinigame</h1>
-        <p className="tagline">Select a mini-game to begin</p>
+        <p className="tagline">Welcome, {user ? user.username : 'Guest'}! Select a mini-game to begin</p>
       </header>
 
       <main className="main-menu">
@@ -258,15 +338,47 @@ const MainMenu = ({ onProfile }) => {
 
 // --- Main App Controller ---
 function App() {
-  // State handles application navigation: 'splash', 'gateway', 'menu', 'profile'
   const [view, setView] = useState('splash');
+  const [user, setUser] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = localStorage.getItem('jwt_token');
+      if (token) {
+        try {
+          const profile = await apiFetch('/users/me');
+          setUser(profile);
+        } catch(e) {
+          localStorage.removeItem('jwt_token');
+        }
+      }
+      setIsInitializing(false);
+    };
+    initAuth();
+  }, []);
+
+  const handleAuthSuccess = (profile) => {
+      setUser(profile);
+      setView('menu');
+  };
+
+  const handleLogout = () => {
+      localStorage.removeItem('jwt_token');
+      setUser(null);
+      setView('gateway');
+  };
+
+  if (isInitializing) {
+     return <SplashScreen onComplete={() => {}} />; // Keep splash visible while init
+  }
 
   return (
     <>
-      {view === 'splash' && <SplashScreen onComplete={() => setView('gateway')} />}
-      {view === 'gateway' && <Gateway onLogin={() => setView('menu')} onGuest={() => setView('menu')} />}
-      {view === 'menu' && <MainMenu onProfile={() => setView('profile')} />}
-      {view === 'profile' && <ProfileScreen onBack={() => setView('menu')} />}
+      {view === 'splash' && <SplashScreen onComplete={() => setView(user ? 'menu' : 'gateway')} />}
+      {view === 'gateway' && <Gateway onAuthSuccess={handleAuthSuccess} onGuest={() => setView('menu')} />}
+      {view === 'menu' && <MainMenu user={user} onProfile={() => setView('profile')} onLogout={handleLogout} />}
+      {view === 'profile' && <ProfileScreen user={user} onUserUpdate={setUser} onBack={() => setView('menu')} />}
     </>
   );
 }
