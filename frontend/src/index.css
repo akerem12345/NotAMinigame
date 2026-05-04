@@ -714,3 +714,315 @@ body {
   color: var(--secondary-neon);
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
+
+/* --- GAME COMPONENTS BASE --- */
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 4rem 2rem 2rem;
+  animation: fadeIn 0.8s ease-out;
+  position: relative;
+  text-align: center;
+}
+
+.game-container h2 {
+  font-size: 3rem;
+  color: var(--primary-neon);
+  margin-bottom: 2rem;
+  text-shadow: 0 0 10px var(--primary-neon);
+}
+
+.action-btn {
+  background: transparent;
+  color: var(--secondary-neon);
+  border: 2px solid var(--secondary-neon);
+  padding: 10px 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  margin-top: 1rem;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: var(--secondary-neon);
+  color: var(--bg-dark);
+  box-shadow: 0 0 15px var(--secondary-neon);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: gray;
+  color: gray;
+}
+
+.active-neon {
+  background: var(--secondary-neon);
+  color: var(--bg-dark);
+  box-shadow: 0 0 15px var(--secondary-neon);
+}
+
+.mt-10 { margin-top: 10px; }
+
+/* --- DICE ROLLER --- */
+.controls {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  background: var(--glass-bg);
+  padding: 1.5rem;
+  border-radius: 15px;
+  border: 1px solid var(--glass-border);
+}
+
+.controls label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.controls select {
+  margin-top: 0.5rem;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: 1px solid var(--primary-neon);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.dice-display {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  min-height: 80px;
+}
+
+.die.neon-box {
+  width: 80px;
+  height: 80px;
+  background: rgba(0,0,0,0.4);
+  border: 2px solid var(--primary-neon);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  box-shadow: inset 0 0 10px rgba(188, 19, 254, 0.3), 0 0 15px rgba(188, 19, 254, 0.4);
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.die.neon-box.rolling {
+  animation: rollAnimation 1s ease-out forwards;
+}
+
+@keyframes rollAnimation {
+  0% { transform: scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  25% { transform: scale(1.2) rotateX(180deg) rotateY(90deg) rotateZ(45deg); border-color: var(--secondary-neon); box-shadow: inset 0 0 20px var(--secondary-neon), 0 0 30px var(--secondary-neon); }
+  50% { transform: scale(1.1) rotateX(360deg) rotateY(180deg) rotateZ(90deg); border-color: var(--accent-neon); box-shadow: inset 0 0 20px var(--accent-neon), 0 0 30px var(--accent-neon); }
+  75% { transform: scale(1.05) rotateX(540deg) rotateY(270deg) rotateZ(135deg); }
+  100% { transform: scale(1) rotateX(720deg) rotateY(360deg) rotateZ(180deg); }
+}
+
+.result-message {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  color: var(--secondary-neon);
+  text-shadow: 0 0 5px var(--secondary-neon);
+}
+
+/* --- TIC TAC TOE --- */
+.status {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--secondary-neon);
+}
+
+.ttt-board {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: var(--glass-border);
+  padding: 5px;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.board-row {
+  display: flex;
+  gap: 5px;
+}
+
+.ttt-square {
+  width: 100px;
+  height: 100px;
+  background: var(--bg-dark);
+  border: 1px solid var(--glass-border);
+  font-size: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  border-radius: 5px;
+}
+
+.ttt-square:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* --- HANGMAN --- */
+.hangman-status {
+  font-size: 1.2rem;
+  color: #ff3366;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 5px #ff3366;
+}
+
+.hangman-word {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.hangman-letter {
+  font-size: 2.5rem;
+  font-weight: bold;
+  width: 40px;
+  border-bottom: 4px solid var(--text-primary);
+  display: flex;
+  justify-content: center;
+  padding-bottom: 5px;
+  color: var(--primary-neon);
+  text-shadow: 0 0 10px var(--primary-neon);
+}
+
+.hangman-keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.key-btn {
+  width: 45px;
+  height: 45px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--text-secondary);
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.key-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.2);
+  border-color: #fff;
+}
+
+.key-btn.correct {
+  background: var(--accent-neon);
+  color: #000;
+  border-color: var(--accent-neon);
+}
+
+.key-btn.wrong {
+  background: #ff3366;
+  color: #000;
+  border-color: #ff3366;
+  opacity: 0.5;
+}
+
+.game-over-message {
+  margin-top: 2rem;
+}
+
+.win-text { color: var(--accent-neon); font-size: 1.5rem; text-shadow: 0 0 10px var(--accent-neon); }
+.lose-text { color: #ff3366; font-size: 1.5rem; text-shadow: 0 0 10px #ff3366; }
+
+/* --- MEMORY MATCH --- */
+.diff-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.memory-header {
+  margin-bottom: 1.5rem;
+}
+
+.timer {
+  font-size: 1.5rem;
+  color: var(--secondary-neon);
+  border: 2px solid var(--secondary-neon);
+  padding: 5px 15px;
+  border-radius: 20px;
+}
+
+.memory-grid {
+  display: grid;
+  gap: 10px;
+  perspective: 1000px;
+}
+
+.memory-card {
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+  background: transparent;
+  perspective: 1000px;
+}
+
+@media (min-width: 600px) {
+  .memory-card { width: 90px; height: 90px; }
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.25s;
+  transform-style: preserve-3d;
+}
+
+.memory-card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 2.5rem;
+  border: 2px solid var(--glass-border);
+}
+
+.card-front {
+  background: linear-gradient(135deg, rgba(188, 19, 254, 0.8), rgba(0, 240, 255, 0.8));
+  color: #fff;
+  font-weight: bold;
+}
+
+.card-back {
+  background: var(--bg-dark);
+  transform: rotateY(180deg);
+  border-color: var(--primary-neon);
+  box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+}

@@ -32,3 +32,10 @@ export const apiFetch = async (endpoint, options = {}) => {
 
   return response.json();
 };
+
+export const submitScore = async (gameType, score, metadata = {}) => {
+  return apiFetch('/scores', {
+    method: 'POST',
+    body: JSON.stringify({ gameType, score, metadata })
+  });
+};

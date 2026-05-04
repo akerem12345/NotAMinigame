@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './index.css';
 import { apiFetch } from './api';
 
+import DiceRoller from './games/DiceRoller';
+import TicTacToe from './games/TicTacToe';
+import Hangman from './games/Hangman';
+import MemoryMatch from './games/MemoryMatch';
+
 const GameCard = ({ icon, title, desc, onPlay }) => {
   return (
     <div className="game-card" onClick={onPlay}>
@@ -266,36 +271,40 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
 };
 
 // --- View 3: Main Menu Component ---
-const MainMenu = ({ user, onProfile, onLogout }) => {
+const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
   const games = [
     {
       id: 1,
-      icon: '❌⭕',
-      title: 'Tic Tac Toe',
-      desc: 'The classic X and O game. Can you beat the AI?',
+      icon: '🎲',
+      title: 'Dice Roller',
+      desc: 'Roll the dice and test your luck for points!',
+      view: 'diceroller'
     },
     {
       id: 2,
-      icon: '🧠',
-      title: 'Memory Match',
-      desc: 'Test your brain and find the matching pairs.',
+      icon: '❌⭕',
+      title: 'Tic Tac Toe',
+      desc: 'The classic X and O game. Play with a friend locally.',
+      view: 'tictactoe'
     },
     {
       id: 3,
-      icon: '🐍',
-      title: 'Retro Snake',
-      desc: 'Eat, grow, and avoid the walls in this arcade classic.',
+      icon: '🪓',
+      title: 'Hangman',
+      desc: 'Guess the word before the man hangs.',
+      view: 'hangman'
     },
     {
       id: 4,
-      icon: '👾',
-      title: 'Space Invaders',
-      desc: 'Defend earth from the invading alien horde.',
+      icon: '🧠',
+      title: 'Memory Match',
+      desc: 'Test your brain and find the matching pairs.',
+      view: 'memorymatch'
     }
   ];
 
-  const handlePlayGame = (title) => {
-    alert(`Starting game: ${title}\n(Game windows will be connected later!)`);
+  const handlePlayGame = (viewName) => {
+    onPlay(viewName);
   };
 
   return (
@@ -323,7 +332,7 @@ const MainMenu = ({ user, onProfile, onLogout }) => {
               icon={game.icon}
               title={game.title}
               desc={game.desc}
-              onPlay={() => handlePlayGame(game.title)}
+              onPlay={() => handlePlayGame(game.view)}
             />
           ))}
         </div>
@@ -377,8 +386,14 @@ function App() {
     <>
       {view === 'splash' && <SplashScreen onComplete={() => setView(user ? 'menu' : 'gateway')} />}
       {view === 'gateway' && <Gateway onAuthSuccess={handleAuthSuccess} onGuest={() => setView('menu')} />}
-      {view === 'menu' && <MainMenu user={user} onProfile={() => setView('profile')} onLogout={handleLogout} />}
+      {view === 'menu' && <MainMenu user={user} onProfile={() => setView('profile')} onLogout={handleLogout} onPlay={setView} />}
       {view === 'profile' && <ProfileScreen user={user} onUserUpdate={setUser} onBack={() => setView('menu')} />}
+      
+      {/* Games */}
+      {view === 'diceroller' && <DiceRoller onBack={() => setView('menu')} />}
+      {view === 'tictactoe' && <TicTacToe onBack={() => setView('menu')} />}
+      {view === 'hangman' && <Hangman onBack={() => setView('menu')} />}
+      {view === 'memorymatch' && <MemoryMatch onBack={() => setView('menu')} />}
     </>
   );
 }
