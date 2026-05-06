@@ -33,4 +33,12 @@ public class User {
     private String bannerhex_1;
 
     private String bannerhex_2;
+
+    private Integer hangmanScore = 0;
+
+    private Integer memoryMatchCountdownScore = 0;
+
+    private Integer memoryMatchTimeChallengeScore = 0;
+
+    private Integer tictactoeScore = 0;
 }

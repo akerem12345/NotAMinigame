@@ -41,7 +41,7 @@ const Gateway = ({ onAuthSuccess, onGuest }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -71,7 +71,7 @@ const Gateway = ({ onAuthSuccess, onGuest }) => {
         });
         localStorage.setItem('jwt_token', token);
       }
-      
+
       // Fetch user profile after getting token
       const profile = await apiFetch('/users/me');
       onAuthSuccess(profile);
@@ -86,14 +86,14 @@ const Gateway = ({ onAuthSuccess, onGuest }) => {
       <div className="modal-content" style={{ animation: 'none' }}>
         <h2>{isLogin ? 'Welcome Back' : 'Join NotAMinigame'}</h2>
 
-        {authError && <div className="auth-error" style={{color: '#ff3366', background: 'rgba(255,51,102,0.1)', padding: '10px', borderRadius: '8px', marginBottom: '15px', textAlign: 'center', fontSize: '0.9rem', border: '1px solid #ff3366'}}>{authError}</div>}
-        
+        {authError && <div className="auth-error" style={{ color: '#ff3366', background: 'rgba(255,51,102,0.1)', padding: '10px', borderRadius: '8px', marginBottom: '15px', textAlign: 'center', fontSize: '0.9rem', border: '1px solid #ff3366' }}>{authError}</div>}
+
         <form className="auth-form" onSubmit={handleSubmit}>
           {!isLogin && (
-             <div className="input-group">
-                <label>Username</label>
-                <input type="text" placeholder="Enter your username" required value={username} onChange={e => setUsername(e.target.value)} />
-             </div>
+            <div className="input-group">
+              <label>Username</label>
+              <input type="text" placeholder="Enter your username" required value={username} onChange={e => setUsername(e.target.value)} />
+            </div>
           )}
           <div className="input-group">
             <label>Email</label>
@@ -102,16 +102,16 @@ const Gateway = ({ onAuthSuccess, onGuest }) => {
           <div className="input-group password-group">
             <label>Password</label>
             <div className="password-input-wrapper">
-              <input 
-                type={showPassword ? "text" : "password"} 
-                placeholder="Enter your password" 
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
               />
-              <button 
-                type="button" 
-                className="eye-btn" 
+              <button
+                type="button"
+                className="eye-btn"
                 onClick={() => setShowPassword(!showPassword)}
                 title={showPassword ? "Hide password" : "Show password"}
               >
@@ -128,9 +128,9 @@ const Gateway = ({ onAuthSuccess, onGuest }) => {
             {isLogin ? 'Login' : 'Register'}
           </button>
         </form>
-        
+
         <div className="gateway-guest-divider">OR</div>
-        
+
         <button className="guest-btn" onClick={onGuest}>
           Play as a Guest
         </button>
@@ -152,21 +152,21 @@ const Gateway = ({ onAuthSuccess, onGuest }) => {
             <p className="tagline" style={{ textAlign: 'center', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
               Enter your email to receive a password reset link.
             </p>
-            
-            <form className="auth-form" onSubmit={async (e) => { 
-                e.preventDefault(); 
-                setForgotPasswordStatus('Gönderiliyor...');
-                try {
-                  const res = await apiFetch('/users/forgot-password', {
-                    method: 'POST',
-                    body: JSON.stringify({ email: forgotPasswordEmail })
-                  });
-                  setForgotPasswordStatus(res.message || "Şifre sıfırlama e-postası e-posta adresinize gönderildi!");
-                } catch(err) {
-                  setForgotPasswordStatus("Hata: " + err.message);
-                }
+
+            <form className="auth-form" onSubmit={async (e) => {
+              e.preventDefault();
+              setForgotPasswordStatus('Gönderiliyor...');
+              try {
+                const res = await apiFetch('/users/forgot-password', {
+                  method: 'POST',
+                  body: JSON.stringify({ email: forgotPasswordEmail })
+                });
+                setForgotPasswordStatus(res.message || "Şifre sıfırlama e-postası e-posta adresinize gönderildi!");
+              } catch (err) {
+                setForgotPasswordStatus("Hata: " + err.message);
+              }
             }}>
-              {forgotPasswordStatus && <div style={{color: '#bc13fe', marginBottom: '10px', fontSize: '0.9rem'}}>{forgotPasswordStatus}</div>}
+              {forgotPasswordStatus && <div style={{ color: '#bc13fe', marginBottom: '10px', fontSize: '0.9rem' }}>{forgotPasswordStatus}</div>}
               <div className="input-group">
                 <label>Email</label>
                 <input type="email" placeholder="Enter your email" required value={forgotPasswordEmail} onChange={e => setForgotPasswordEmail(e.target.value)} />
@@ -190,19 +190,19 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
 
   const handleBack = async () => {
     if (user && user.id) {
-        try {
-            const updatedProfile = await apiFetch(`/users/${user.id}`, {
-                method: 'PATCH',
-                body: JSON.stringify({
-                    pphex: avatarColor,
-                    bannerhex_1: bannerColor1,
-                    bannerhex_2: bannerColor2
-                })
-            });
-            onUserUpdate(updatedProfile);
-        } catch(e) {
-            console.error("Failed to save colors", e);
-        }
+      try {
+        const updatedProfile = await apiFetch(`/users/${user.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            pphex: avatarColor,
+            bannerhex_1: bannerColor1,
+            bannerhex_2: bannerColor2
+          })
+        });
+        onUserUpdate(updatedProfile);
+      } catch (e) {
+        console.error("Failed to save colors", e);
+      }
     }
     onBack();
   };
@@ -211,46 +211,46 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
     <div className="profile-container">
       <button className="back-btn" onClick={handleBack}>←</button>
       <div className="profile-card">
-        <div 
+        <div
           className="profile-banner"
           style={{ background: `linear-gradient(135deg, ${bannerColor1}, ${bannerColor2})` }}
         >
           <div className="banner-color-picker">
             <span className="banner-color-label">Color 1</span>
             <div className="banner-color-btn" style={{ backgroundColor: bannerColor1 }} title="Choose Banner Color 1">
-              <input 
-                type="color" 
-                value={bannerColor1} 
-                onChange={(e) => setBannerColor1(e.target.value)} 
+              <input
+                type="color"
+                value={bannerColor1}
+                onChange={(e) => setBannerColor1(e.target.value)}
               />
             </div>
           </div>
           <div className="banner-color-picker">
             <div className="banner-color-btn" style={{ backgroundColor: bannerColor2 }} title="Choose Banner Color 2">
-              <input 
-                type="color" 
-                value={bannerColor2} 
-                onChange={(e) => setBannerColor2(e.target.value)} 
+              <input
+                type="color"
+                value={bannerColor2}
+                onChange={(e) => setBannerColor2(e.target.value)}
               />
             </div>
             <span className="banner-color-label">Color 2</span>
           </div>
         </div>
-        <div 
-          className="profile-avatar" 
-          style={{ 
-            backgroundColor: avatarColor, 
+        <div
+          className="profile-avatar"
+          style={{
+            backgroundColor: avatarColor,
             boxShadow: `0 0 20px ${avatarColor}80`,
             position: 'relative',
             overflow: 'hidden'
           }}
           title="Change Avatar Color"
         >
-          <input 
+          <input
             type="color"
             value={avatarColor}
             onChange={(e) => setAvatarColor(e.target.value)}
-            style={{ 
+            style={{
               position: 'absolute',
               top: 0,
               left: 0,
@@ -264,7 +264,20 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
           />
         </div>
         <h3 className="profile-username">{user?.username || 'Guest'}</h3>
-        <div className="profile-score">Score: <span style={{ opacity: 0.5 }}>null</span></div>
+        <div className="profile-scores-container" style={{ marginTop: '1rem', width: '100%', padding: '0 2rem', boxSizing: 'border-box' }}>
+          <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' }}>
+            <span>Hangman:</span> <span style={{ color: 'var(--secondary-neon)' }}>{user?.hangmanScore || 0}</span>
+          </div>
+          <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' }}>
+            <span>Memory Match (Countdown):</span> <span style={{ color: 'var(--primary-neon)' }}>{user?.memoryMatchCountdownScore || 0}</span>
+          </div>
+          <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' }}>
+            <span>Memory Match (Time Challenge):</span> <span style={{ color: 'var(--primary-neon)' }}>{user?.memoryMatchTimeChallengeScore || 0}</span>
+          </div>
+          <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0' }}>
+            <span>Tic-Tac-Toe:</span> <span style={{ color: '#00f0ff' }}>{user?.tictactoeScore || 0}</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -272,6 +285,8 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
 
 // --- View 3: Main Menu Component ---
 const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
+  const [showSdmMsg, setShowSdmMsg] = useState(false);
+
   const games = [
     {
       id: 1,
@@ -312,7 +327,7 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
       <div className="header-actions">
         {user ? (
           <>
-            <button className="auth-btn" onClick={onLogout} style={{marginRight: '10px'}}>Logout</button>
+            <button className="auth-btn" onClick={onLogout} style={{ marginRight: '10px' }}>Logout</button>
             <button className="profile-btn" onClick={onProfile}>👤 Profile</button>
           </>
         ) : (
@@ -338,8 +353,45 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
         </div>
       </main>
 
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', paddingLeft: '2rem', position: 'relative' }}>
+        <img
+          src="/resources/images/sdm.png"
+          alt="SDM"
+          width="144"
+          height="24"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setShowSdmMsg(!showSdmMsg)}
+        />
+        {showSdmMsg && (
+          <div style={{
+            position: 'absolute',
+            bottom: '35px',
+            left: '2rem',
+            background: '#bc13fe',
+            color: 'white',
+            padding: '8px 12px',
+            borderRadius: '12px',
+            fontSize: '0.9rem',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.5)',
+            zIndex: 10,
+            whiteSpace: 'nowrap'
+          }}>
+            congratulations you found me
+            <div style={{
+              position: 'absolute',
+              bottom: '-8px',
+              left: '20px',
+              borderWidth: '8px 8px 0',
+              borderStyle: 'solid',
+              borderColor: '#bc13fe transparent transparent transparent'
+            }} />
+          </div>
+        )}
+      </div>
+
       <footer className="footer">
-        <p>Built: Aki and Onur. <span className="footer-highlight">Ready for action.</span></p>
+        <p>Built by: Aki and Onur. <span className="footer-highlight">No rights reserved.</span></p>
       </footer>
     </div>
   );
@@ -358,7 +410,7 @@ function App() {
         try {
           const profile = await apiFetch('/users/me');
           setUser(profile);
-        } catch(e) {
+        } catch (e) {
           localStorage.removeItem('jwt_token');
         }
       }
@@ -368,18 +420,18 @@ function App() {
   }, []);
 
   const handleAuthSuccess = (profile) => {
-      setUser(profile);
-      setView('menu');
+    setUser(profile);
+    setView('menu');
   };
 
   const handleLogout = () => {
-      localStorage.removeItem('jwt_token');
-      setUser(null);
-      setView('gateway');
+    localStorage.removeItem('jwt_token');
+    setUser(null);
+    setView('gateway');
   };
 
   if (isInitializing) {
-     return <SplashScreen onComplete={() => {}} />; // Keep splash visible while init
+    return <SplashScreen onComplete={() => { }} />; // Keep splash visible while init
   }
 
   return (
@@ -388,7 +440,7 @@ function App() {
       {view === 'gateway' && <Gateway onAuthSuccess={handleAuthSuccess} onGuest={() => setView('menu')} />}
       {view === 'menu' && <MainMenu user={user} onProfile={() => setView('profile')} onLogout={handleLogout} onPlay={setView} />}
       {view === 'profile' && <ProfileScreen user={user} onUserUpdate={setUser} onBack={() => setView('menu')} />}
-      
+
       {/* Games */}
       {view === 'diceroller' && <DiceRoller onBack={() => setView('menu')} />}
       {view === 'tictactoe' && <TicTacToe onBack={() => setView('menu')} />}

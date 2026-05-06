@@ -81,7 +81,8 @@ public class UserController {
 
         UserProfileDto dto = new UserProfileDto(
                 user.getId(), user.getUsername(), user.getEmail(),
-                user.getPphex(), user.getBannerhex_1(), user.getBannerhex_2()
+                user.getPphex(), user.getBannerhex_1(), user.getBannerhex_2(),
+                user.getHangmanScore(), user.getMemoryMatchCountdownScore(), user.getMemoryMatchTimeChallengeScore(), user.getTictactoeScore()
         );
         return ResponseEntity.ok(dto);
     }
@@ -94,7 +95,8 @@ public class UserController {
 
         UserProfileDto dto = new UserProfileDto(
                 user.getId(), user.getUsername(), user.getEmail(),
-                user.getPphex(), user.getBannerhex_1(), user.getBannerhex_2()
+                user.getPphex(), user.getBannerhex_1(), user.getBannerhex_2(),
+                user.getHangmanScore(), user.getMemoryMatchCountdownScore(), user.getMemoryMatchTimeChallengeScore(), user.getTictactoeScore()
         );
         return ResponseEntity.ok(dto);
     }
@@ -114,7 +116,8 @@ public class UserController {
         User saved = userRepository.save(user);
         UserProfileDto response = new UserProfileDto(
                 saved.getId(), saved.getUsername(), saved.getEmail(),
-                saved.getPphex(), saved.getBannerhex_1(), saved.getBannerhex_2()
+                saved.getPphex(), saved.getBannerhex_1(), saved.getBannerhex_2(),
+                saved.getHangmanScore(), saved.getMemoryMatchCountdownScore(), saved.getMemoryMatchTimeChallengeScore(), saved.getTictactoeScore()
         );
         return ResponseEntity.ok(response);
     }

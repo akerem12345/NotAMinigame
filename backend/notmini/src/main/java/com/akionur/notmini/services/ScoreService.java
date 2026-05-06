@@ -28,6 +28,26 @@ public class ScoreService {
         score.setScore(requestDto.getScore());
         score.setMetadata(requestDto.getMetadata());
 
-        return scoreRepository.save(score);
+        Score savedScore = scoreRepository.save(score);
+
+        if (user != null) {
+            String game = requestDto.getGameType();
+            int points = requestDto.getScore() != null ? requestDto.getScore() : 0;
+            if ("HANGMAN".equalsIgnoreCase(game)) {
+                user.setHangmanScore((user.getHangmanScore() == null ? 0 : user.getHangmanScore()) + points);
+            } else if ("MEMORY".equalsIgnoreCase(game)) {
+                String mode = requestDto.getMetadata() != null ? (String) requestDto.getMetadata().get("gameMode") : null;
+                if ("countdown".equals(mode)) {
+                    user.setMemoryMatchCountdownScore((user.getMemoryMatchCountdownScore() == null ? 0 : user.getMemoryMatchCountdownScore()) + points);
+                } else if ("timeChallenge".equals(mode)) {
+                    user.setMemoryMatchTimeChallengeScore((user.getMemoryMatchTimeChallengeScore() == null ? 0 : user.getMemoryMatchTimeChallengeScore()) + points);
+                }
+            } else if ("TIC_TAC_TOE".equalsIgnoreCase(game)) {
+                user.setTictactoeScore((user.getTictactoeScore() == null ? 0 : user.getTictactoeScore()) + points);
+            }
+            userRepository.save(user);
+        }
+
+        return savedScore;
     }
 }

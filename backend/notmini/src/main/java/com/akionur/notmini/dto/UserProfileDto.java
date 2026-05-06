@@ -17,4 +17,8 @@ public class UserProfileDto {
     private String pphex;
     private String bannerhex_1;
     private String bannerhex_2;
+    private Integer hangmanScore;
+    private Integer memoryMatchCountdownScore;
+    private Integer memoryMatchTimeChallengeScore;
+    private Integer tictactoeScore;
 }
