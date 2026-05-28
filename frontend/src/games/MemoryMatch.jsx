@@ -2,6 +2,99 @@ import React, { useState, useEffect } from 'react';
 import { submitScore } from '../api';
 import '../index.css';
 
+// Synthetic sound generator using Web Audio API
+const playSound = (type) => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    
+    if (type === 'flip') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(450, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+    } else if (type === 'match-success') {
+      const playTone = (freq, delay, duration) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+        gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + delay + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + duration);
+      };
+      playTone(587.33, 0, 0.08); // D5
+      playTone(880, 0.06, 0.15); // A5
+    } else if (type === 'match-fail') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(180, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } else if (type === 'win') {
+      const playTone = (freq, delay, duration) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+        gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + delay + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + duration);
+      };
+      playTone(523.25, 0, 0.15); // C5
+      playTone(659.25, 0.08, 0.15); // E5
+      playTone(783.99, 0.16, 0.3); // G5
+    } else if (type === 'lose') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.4);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+    } else if (type === 'click') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.08);
+    }
+  } catch (e) {
+    console.warn("Audio Context failed", e);
+  }
+};
+
 const difficulties = {
   easy: { name: 'Easy', rows: 4, cols: 4, time: 60, multiplier: 1 },
   medium: { name: 'Medium', rows: 6, cols: 6, time: 180, multiplier: 2 },
@@ -72,6 +165,9 @@ const MemoryMatch = ({ onBack }) => {
       return;
     }
 
+    // Play flip sound
+    playSound('flip');
+
     const newFlipped = [...flippedIndices, idx];
     setFlippedIndices(newFlipped);
 
@@ -81,12 +177,19 @@ const MemoryMatch = ({ onBack }) => {
         const newMatched = [...matchedIndices, first, second];
         setMatchedIndices(newMatched);
         setFlippedIndices([]);
+        
+        // Play match success sound
+        playSound('match-success');
 
         if (newMatched.length === cards.length) {
           handleGameOver(true, time);
         }
       } else {
-        setTimeout(() => setFlippedIndices([]), 400);
+        setTimeout(() => {
+          setFlippedIndices([]);
+          // Play match fail sound
+          playSound('match-fail');
+        }, 400);
       }
     }
   };
@@ -96,7 +199,9 @@ const MemoryMatch = ({ onBack }) => {
     setWinStatus(won);
     setIsPlaying(false);
 
+    // Play game over sounds
     if (won) {
+      playSound('win');
       const config = difficulties[diff];
       let score = 0;
 
@@ -121,7 +226,20 @@ const MemoryMatch = ({ onBack }) => {
       } catch (e) {
         console.error("Score save failed", e);
       }
+    } else {
+      playSound('lose');
     }
+  };
+
+  const handleSelectMode = (mode) => {
+    playSound('click');
+    setGameMode(mode);
+  };
+
+  const handleSelectDiff = (k) => {
+    playSound('click');
+    setDiff(k);
+    initGame(k, gameMode);
   };
 
   return (
@@ -133,14 +251,14 @@ const MemoryMatch = ({ onBack }) => {
         <div className="diff-selector">
           <h3>Select Game Mode</h3>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '1.5rem' }}>
-            <button className={`action-btn ${gameMode === 'countdown' ? 'active-neon' : ''}`} onClick={() => setGameMode('countdown')}>Countdown</button>
-            <button className={`action-btn ${gameMode === 'timeChallenge' ? 'active-neon' : ''}`} onClick={() => setGameMode('timeChallenge')}>Time Challenge</button>
+            <button className={`action-btn ${gameMode === 'countdown' ? 'active-neon' : ''}`} onClick={() => handleSelectMode('countdown')}>Countdown</button>
+            <button className={`action-btn ${gameMode === 'timeChallenge' ? 'active-neon' : ''}`} onClick={() => handleSelectMode('timeChallenge')}>Time Challenge</button>
           </div>
 
           <h3>Select Difficulty</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {Object.entries(difficulties).map(([k, v]) => (
-              <button key={k} className="action-btn" onClick={() => { setDiff(k); initGame(k, gameMode); }}>
+              <button key={k} className="action-btn" onClick={() => handleSelectDiff(k)}>
                 {v.name} ({v.rows}x{v.cols})
               </button>
             ))}
@@ -188,8 +306,8 @@ const MemoryMatch = ({ onBack }) => {
                 <div className="lose-text">Time's Up! Game Over.</div>
               )}
               <div style={{ marginTop: '1.5rem' }}>
-                <button className="action-btn" onClick={() => initGame(diff, gameMode)}>Play Again</button>
-                <button className="action-btn" style={{ marginLeft: '10px' }} onClick={() => { setIsPlaying(false); setGameOver(false); }}>Change Mode/Difficulty</button>
+                <button className="action-btn" onClick={() => { playSound('click'); initGame(diff, gameMode); }}>Play Again</button>
+                <button className="action-btn" style={{ marginLeft: '10px' }} onClick={() => { playSound('click'); setIsPlaying(false); setGameOver(false); }}>Change Mode/Difficulty</button>
               </div>
             </div>
           )}

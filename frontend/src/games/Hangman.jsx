@@ -2,6 +2,81 @@ import React, { useState, useCallback } from 'react';
 import { submitScore } from '../api';
 import '../index.css';
 
+// Synthetic sound generator using Web Audio API
+const playSound = (type) => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    
+    if (type === 'correct') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime); // high bell pitch
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } else if (type === 'wrong') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(180, ctx.currentTime); // low knock pitch
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.18);
+    } else if (type === 'win') {
+      const playTone = (freq, delay, duration) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+        gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + delay + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + duration);
+      };
+      playTone(523.25, 0, 0.15); // C5
+      playTone(659.25, 0.08, 0.15); // E5
+      playTone(783.99, 0.16, 0.3); // G5
+    } else if (type === 'lose') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.4);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+    } else if (type === 'click') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.08);
+    }
+  } catch (e) {
+    console.warn("Audio Context failed", e);
+  }
+};
+
 const CATEGORIES = {
   ANIMALS: ["ELEPHANT", "GIRAFFE", "KANGAROO", "DOLPHIN", "PENGUIN", "CHIMPANZEE", "RHINOCEROS"],
   TECHNOLOGY: ["ALGORITHM", "BANDWIDTH", "COMPILER", "DATABASE", "ENCRYPTION", "JAVASCRIPT", "PROCESSOR"],
@@ -38,6 +113,7 @@ const Hangman = ({ onBack }) => {
   const maxMistakes = 6;
 
   const initGame = (selectedCat) => {
+    playSound('click');
     const wordsPool = CATEGORIES[selectedCat];
     const randomIndex = Math.floor(Math.random() * wordsPool.length);
     setCategory(selectedCat);
@@ -56,19 +132,26 @@ const Hangman = ({ onBack }) => {
     setGuessedLetters(newGuessed);
 
     let currentMistakes = mistakes;
-    if (!word.includes(letter)) {
+    const isCorrect = word.includes(letter);
+    
+    if (!isCorrect) {
       currentMistakes += 1;
       setMistakes(currentMistakes);
+      playSound('wrong');
+    } else {
+      playSound('correct');
     }
 
     const won = word.split('').every(char => newGuessed.has(char));
     if (won) {
       setIsWinner(true);
+      playSound('win');
       // Score based on word length and remaining lives
       const score = (word.length * 10) + ((maxMistakes - currentMistakes) * 15);
       await saveScore(score);
     } else if (currentMistakes >= maxMistakes) {
       setIsLoser(true);
+      playSound('lose');
     }
   }, [guessedLetters, isWinner, isLoser, word, mistakes]);
 
@@ -78,6 +161,16 @@ const Hangman = ({ onBack }) => {
     } catch (e) {
       console.error("Score save failed", e);
     }
+  };
+
+  const handleResetGame = () => {
+    playSound('click');
+    initGame(category);
+  };
+
+  const handleChangeCategory = () => {
+    playSound('click');
+    setCategory(null);
   };
 
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
@@ -130,8 +223,8 @@ const Hangman = ({ onBack }) => {
             {isLoser && <div className="lose-text">Game Over! Word was: {word}</div>}
             {(isWinner || isLoser) && (
               <div style={{marginTop:'1rem'}}>
-                <button className="action-btn" onClick={() => initGame(category)}>Play Again</button>
-                <button className="action-btn" style={{marginLeft:'10px'}} onClick={() => setCategory(null)}>Change Category</button>
+                <button className="action-btn" onClick={handleResetGame}>Play Again</button>
+                <button className="action-btn" style={{marginLeft:'10px'}} onClick={handleChangeCategory}>Change Category</button>
               </div>
             )}
           </div>
