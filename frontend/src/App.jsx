@@ -6,6 +6,8 @@ import DiceRoller from './games/DiceRoller';
 import TicTacToe from './games/TicTacToe';
 import Hangman from './games/Hangman';
 import MemoryMatch from './games/MemoryMatch';
+import HeadOrTail from './games/HeadOrTail';
+import F1Reaction from './games/F1Reaction';
 
 const GameCard = ({ icon, title, desc, onPlay }) => {
   return (
@@ -274,8 +276,14 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
           <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' }}>
             <span>Memory Match (Time Challenge):</span> <span style={{ color: 'var(--primary-neon)' }}>{user?.memoryMatchTimeChallengeScore || 0}</span>
           </div>
-          <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0' }}>
+          <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' }}>
             <span>Tic-Tac-Toe:</span> <span style={{ color: '#00f0ff' }}>{user?.tictactoeScore || 0}</span>
+          </div>
+          <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' }}>
+            <span>Head or Tail:</span> <span style={{ color: 'var(--accent-neon)' }}>{user?.headOrTailScore || 0}</span>
+          </div>
+          <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0' }}>
+            <span>F1 Start Reaction:</span> <span style={{ color: '#ff3366' }}>{user?.f1ReactionScore || 0} pts</span>
           </div>
         </div>
       </div>
@@ -315,6 +323,20 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
       title: 'Memory Match',
       desc: 'Test your brain and find the matching pairs.',
       view: 'memorymatch'
+    },
+    {
+      id: 5,
+      icon: '🪙',
+      title: 'Head or Tail',
+      desc: 'Flip the neon coin and guess the outcome!',
+      view: 'headortail'
+    },
+    {
+      id: 6,
+      icon: '🏎️',
+      title: 'F1 Start Reaction',
+      desc: 'Test your reflexes on the F1 grid against pilot times!',
+      view: 'f1reaction'
     }
   ];
 
@@ -438,7 +460,18 @@ function App() {
     <>
       {view === 'splash' && <SplashScreen onComplete={() => setView(user ? 'menu' : 'gateway')} />}
       {view === 'gateway' && <Gateway onAuthSuccess={handleAuthSuccess} onGuest={() => setView('menu')} />}
-      {view === 'menu' && <MainMenu user={user} onProfile={() => setView('profile')} onLogout={handleLogout} onPlay={setView} />}
+      {view === 'menu' && <MainMenu user={user} onProfile={async () => {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+          try {
+            const profile = await apiFetch('/users/me');
+            setUser(profile);
+          } catch (e) {
+            console.error("Failed to refresh profile details", e);
+          }
+        }
+        setView('profile');
+      }} onLogout={handleLogout} onPlay={setView} />}
       {view === 'profile' && <ProfileScreen user={user} onUserUpdate={setUser} onBack={() => setView('menu')} />}
 
       {/* Games */}
@@ -446,6 +479,8 @@ function App() {
       {view === 'tictactoe' && <TicTacToe onBack={() => setView('menu')} />}
       {view === 'hangman' && <Hangman onBack={() => setView('menu')} />}
       {view === 'memorymatch' && <MemoryMatch onBack={() => setView('menu')} />}
+      {view === 'headortail' && <HeadOrTail onBack={() => setView('menu')} />}
+      {view === 'f1reaction' && <F1Reaction onBack={() => setView('menu')} />}
     </>
   );
 }

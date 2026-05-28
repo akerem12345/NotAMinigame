@@ -21,4 +21,6 @@ public class UserProfileDto {
     private Integer memoryMatchCountdownScore;
     private Integer memoryMatchTimeChallengeScore;
     private Integer tictactoeScore;
+    private Integer headOrTailScore;
+    private Integer f1ReactionScore;
 }

@@ -82,7 +82,7 @@ public class UserController {
         UserProfileDto dto = new UserProfileDto(
                 user.getId(), user.getUsername(), user.getEmail(),
                 user.getPphex(), user.getBannerhex_1(), user.getBannerhex_2(),
-                user.getHangmanScore(), user.getMemoryMatchCountdownScore(), user.getMemoryMatchTimeChallengeScore(), user.getTictactoeScore()
+                user.getHangmanScore(), user.getMemoryMatchCountdownScore(), user.getMemoryMatchTimeChallengeScore(), user.getTictactoeScore(), user.getHeadOrTailScore(), user.getF1ReactionScore()
         );
         return ResponseEntity.ok(dto);
     }
@@ -96,7 +96,7 @@ public class UserController {
         UserProfileDto dto = new UserProfileDto(
                 user.getId(), user.getUsername(), user.getEmail(),
                 user.getPphex(), user.getBannerhex_1(), user.getBannerhex_2(),
-                user.getHangmanScore(), user.getMemoryMatchCountdownScore(), user.getMemoryMatchTimeChallengeScore(), user.getTictactoeScore()
+                user.getHangmanScore(), user.getMemoryMatchCountdownScore(), user.getMemoryMatchTimeChallengeScore(), user.getTictactoeScore(), user.getHeadOrTailScore(), user.getF1ReactionScore()
         );
         return ResponseEntity.ok(dto);
     }
@@ -117,7 +117,7 @@ public class UserController {
         UserProfileDto response = new UserProfileDto(
                 saved.getId(), saved.getUsername(), saved.getEmail(),
                 saved.getPphex(), saved.getBannerhex_1(), saved.getBannerhex_2(),
-                saved.getHangmanScore(), saved.getMemoryMatchCountdownScore(), saved.getMemoryMatchTimeChallengeScore(), saved.getTictactoeScore()
+                saved.getHangmanScore(), saved.getMemoryMatchCountdownScore(), saved.getMemoryMatchTimeChallengeScore(), saved.getTictactoeScore(), saved.getHeadOrTailScore(), saved.getF1ReactionScore()
         );
         return ResponseEntity.ok(response);
     }

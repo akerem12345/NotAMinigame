@@ -44,6 +44,10 @@ public class ScoreService {
                 }
             } else if ("TIC_TAC_TOE".equalsIgnoreCase(game)) {
                 user.setTictactoeScore((user.getTictactoeScore() == null ? 0 : user.getTictactoeScore()) + points);
+            } else if ("HEAD_OR_TAIL".equalsIgnoreCase(game)) {
+                user.setHeadOrTailScore((user.getHeadOrTailScore() == null ? 0 : user.getHeadOrTailScore()) + points);
+            } else if ("F1_REACTION".equalsIgnoreCase(game)) {
+                user.setF1ReactionScore((user.getF1ReactionScore() == null ? 0 : user.getF1ReactionScore()) + points);
             }
             userRepository.save(user);
         }

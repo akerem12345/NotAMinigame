@@ -41,4 +41,8 @@ public class User {
     private Integer memoryMatchTimeChallengeScore = 0;
 
     private Integer tictactoeScore = 0;
+
+    private Integer headOrTailScore = 0;
+
+    private Integer f1ReactionScore = 0;
 }
