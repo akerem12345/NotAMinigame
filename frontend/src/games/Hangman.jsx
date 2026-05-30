@@ -125,7 +125,7 @@ const Hangman = ({ onBack }) => {
             ))}
           </div>
 
-          <div className="game-over-message">
+          <div className="game-over-message">npm
             {isWinner && <div className="win-text">You Won! Score: {(word.length * 10) + ((maxMistakes - mistakes) * 15)}</div>}
             {isLoser && <div className="lose-text">Game Over! Word was: {word}</div>}
             {(isWinner || isLoser) && (
