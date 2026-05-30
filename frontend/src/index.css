@@ -1500,3 +1500,403 @@ body {
   color: var(--secondary-neon);
 }
 
+/* --- CASINO STYLE DICE ROLLER --- */
+.dice-roller-board {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  max-height: 100vh;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%),
+              url('/resources/images/green-fabric.jpg') repeat center center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1.5rem 2rem;
+  color: #fff;
+  font-family: var(--font-main);
+  overflow: hidden;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
+}
+
+/* Wood frame around the casino table to feel premium */
+.dice-roller-board::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 16px solid #4a2711; /* Mahogany wood brown */
+  border-image: linear-gradient(135deg, #2b1408, #522d17, #2b1408) 16;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Golden inner line */
+.dice-roller-board::after {
+  content: '';
+  position: absolute;
+  top: 16px; left: 16px; right: 16px; bottom: 16px;
+  border: 3px solid #d4af37; /* Gold */
+  pointer-events: none;
+  z-index: 9;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.casino-header {
+  margin-top: 0.5rem;
+  margin-bottom: 1.2rem;
+  text-align: center;
+  z-index: 5;
+}
+
+.casino-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 20px rgba(212, 175, 55, 0.6);
+  letter-spacing: 2px;
+  margin-bottom: 0.2rem;
+}
+
+.casino-subtitle {
+  font-size: 1.1rem;
+  color: #d4af37; /* Gold text */
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px rgba(212, 175, 55, 0.4);
+}
+
+.casino-controls {
+  display: flex;
+  gap: 1.5rem;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  border: 2px solid #d4af37;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  margin-bottom: 1.8rem;
+  z-index: 5;
+}
+
+.casino-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.casino-control-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.casino-select {
+  background: #111;
+  color: #fff;
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.casino-select:hover {
+  background: #222;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
+/* Cups container and movement */
+.cups-wrapper {
+  position: relative;
+  width: 320px;
+  height: 300px;
+  margin: 0.5rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.cups-container-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.cups-container-inner.idle {
+  animation: cupFloat 3s ease-in-out infinite;
+}
+
+.cups-container-inner.shaking {
+  animation: cupShake 0.15s linear infinite;
+}
+
+.dice-cup-element {
+  position: absolute;
+  width: 150px;
+  height: 200px;
+  background-image: url('/resources/images/dice-cup.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
+  filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6));
+}
+
+/* Cups closed state position */
+.dice-cup-element.top {
+  transform: translateY(-60px) rotate(180deg);
+  transform-origin: center center;
+}
+
+.dice-cup-element.bottom {
+  transform: translateY(60px);
+  transform-origin: center center;
+}
+
+/* Cups separated state position */
+.dice-cup-element.top.separated {
+  transform: translateY(-210px) rotate(180deg);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.dice-cup-element.bottom.separated {
+  transform: translateY(210px);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* Animation: Floating idle together */
+@keyframes cupFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Animation: Fast shake rattle */
+@keyframes cupShake {
+  0% { transform: translate(3px, 2px) rotate(2deg); }
+  20% { transform: translate(-3px, -2px) rotate(-2deg); }
+  40% { transform: translate(-4px, 3px) rotate(3deg); }
+  60% { transform: translate(3px, -2px) rotate(-1deg); }
+  80% { transform: translate(-2px, 2px) rotate(2deg); }
+  100% { transform: translate(2px, -3px) rotate(-3deg); }
+}
+
+/* Dice Tray (where sliding dice appear) */
+.dice-tray {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+  width: 100%;
+  max-width: 800px;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Casino Dice styles - white square tile */
+.casino-die-tile {
+  background: radial-gradient(circle, #ffffff 60%, #e6e6e6 100%);
+  border: 3px solid #d4af37; /* Golden border */
+  border-radius: 16px;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.8);
+  position: relative;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  pointer-events: auto;
+}
+
+.casino-die-tile:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+.casino-die-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #8a1f1f; /* Casino Crimson */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.casino-die-value {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #111;
+  line-height: 1;
+  margin-bottom: 4px;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+}
+
+/* Neon Glow under Dice */
+.casino-die-tile::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 10%;
+  width: 80%;
+  height: 8px;
+  background: rgba(212, 175, 55, 0.3);
+  filter: blur(5px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Sliding and rotating entry of dice from center */
+@keyframes diceSlideOut {
+  0% {
+    transform: scale(0.2) translateY(-100px) rotate(-120deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) translateY(10px) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.casino-die-tile.sliding-out {
+  animation: diceSlideOut 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Results panel */
+.casino-results-panel {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid #d4af37;
+  border-radius: 16px;
+  padding: 0.8rem 1.5rem;
+  max-width: 460px;
+  width: 100%;
+  margin-top: 0.8rem;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+  z-index: 5;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.casino-results-sum {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.casino-results-sum span {
+  color: #d4af37;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.casino-results-details {
+  font-size: 1rem;
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+
+.casino-luck-points {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #39ff14; /* Accent neon green */
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+  background: rgba(57, 255, 20, 0.1);
+  padding: 8px 16px;
+  border-radius: 30px;
+  display: inline-block;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  margin-bottom: 1rem;
+}
+
+/* Gold action buttons */
+.casino-action-btn {
+  background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+  color: #111;
+  border: 1px solid #ffdf7a;
+  border-radius: 30px;
+  padding: 12px 32px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4), inset 0 2px 3px rgba(255,255,255,0.3);
+  transition: all 0.3s ease;
+  z-index: 5;
+  margin-top: 1rem;
+}
+
+.casino-action-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4), inset 0 2px 3px rgba(255,255,255,0.4);
+  background: linear-gradient(135deg, #ffe17d 0%, #d4af37 100%);
+}
+
+.casino-action-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+
+.casino-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #444;
+  border-color: #555;
+  color: #888;
+  box-shadow: none;
+}
+
+.casino-back-btn {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  background: rgba(0,0,0,0.7);
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.5rem;
+  z-index: 15;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.casino-back-btn:hover {
+  background: #d4af37;
+  color: #111;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+}
+
+
