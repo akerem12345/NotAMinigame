@@ -400,10 +400,12 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
           flex: 1;
         }
 
-        .featured-icon {
-          font-size: 4rem;
+        .featured-logo {
+          width: 140px;
+          height: 140px;
+          object-fit: contain;
           animation: bounceBeaker 2s ease-in-out infinite alternate;
-          filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.5));
+          filter: drop-shadow(0 0 15px rgba(255, 140, 0, 0.4));
           display: inline-block;
         }
 
@@ -504,7 +506,7 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
         <div className="featured-banner" onClick={() => handlePlayGame('planktonsteal')}>
           <div className="featured-badge">🔥 Featured Release</div>
           <div className="featured-content">
-            <span className="featured-icon">🧪</span>
+            <img src="/resources/images/planktonmenu.png" alt="Plankton Logo" className="featured-logo" />
             <div className="featured-info">
               <h2 className="featured-title">Plankton's Plan</h2>
               <p className="featured-desc">

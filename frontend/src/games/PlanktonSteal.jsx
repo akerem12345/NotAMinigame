@@ -140,6 +140,18 @@ const PlanktonSteal = ({ onBack }) => {
   const grillInterval = useRef(null);
   const fryerInterval = useRef(null);
   const drinkInterval = useRef(null);
+  const bgMusicRef = useRef(null);
+
+  const playBackgroundMusic = () => {
+    if (!bgMusicRef.current) {
+      bgMusicRef.current = new Audio('/resources/sound/clownfish.mp3');
+      bgMusicRef.current.loop = true;
+      bgMusicRef.current.volume = 0.4;
+    }
+    bgMusicRef.current.play().catch((e) => {
+      console.warn("Failed to play background music:", e);
+    });
+  };
 
   const scene1Text = "time to steal the formula";
   const scene2Dialogues = [
@@ -169,7 +181,7 @@ const PlanktonSteal = ({ onBack }) => {
     }, speed);
   };
 
-  // Stop all intervals on unmount
+  // Stop all intervals and music on unmount
   useEffect(() => {
     return () => {
       clearInterval(typingTimer.current);
@@ -177,6 +189,10 @@ const PlanktonSteal = ({ onBack }) => {
       clearInterval(grillInterval.current);
       clearInterval(fryerInterval.current);
       clearInterval(drinkInterval.current);
+      if (bgMusicRef.current) {
+        bgMusicRef.current.pause();
+        bgMusicRef.current = null;
+      }
     };
   }, []);
 
@@ -313,6 +329,9 @@ const PlanktonSteal = ({ onBack }) => {
 
   // Initiate a new customer round
   const startCustomerRound = (roundNumber) => {
+    if (roundNumber === 1) {
+      playBackgroundMusic();
+    }
     setCustomerRound(roundNumber);
     setCustomerEntered(false);
     setCustomerSpeechVisible(false);
