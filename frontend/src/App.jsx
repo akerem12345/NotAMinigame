@@ -8,6 +8,7 @@ import Hangman from './games/Hangman';
 import MemoryMatch from './games/MemoryMatch';
 import HeadOrTail from './games/HeadOrTail';
 import F1Reaction from './games/F1Reaction';
+import PlanktonSteal from './games/PlanktonSteal';
 
 const GameCard = ({ icon, title, desc, onPlay }) => {
   return (
@@ -346,6 +347,143 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
 
   return (
     <div className="app-container">
+      {/* Scoped styles for the featured full-width banner */}
+      <style>{`
+        .featured-banner {
+          width: 100%;
+          max-width: 1000px;
+          background: linear-gradient(135deg, rgba(255, 140, 0, 0.13), rgba(188, 19, 254, 0.13));
+          border: 2px solid #ff8c00;
+          box-shadow: 0 8px 32px 0 rgba(255, 140, 0, 0.12), 0 0 15px rgba(255, 140, 0, 0.18);
+          border-radius: 24px;
+          padding: 2rem;
+          margin-bottom: 3rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: relative;
+          overflow: hidden;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          box-sizing: border-box;
+          animation: fadeIn 0.8s ease-out;
+        }
+
+        .featured-banner:hover {
+          transform: translateY(-5px);
+          border-color: #bc13fe;
+          box-shadow: 0 12px 40px 0 rgba(188, 19, 254, 0.25), 0 0 25px rgba(188, 19, 254, 0.3);
+        }
+
+        .featured-badge {
+          position: absolute;
+          top: 15px;
+          right: 20px;
+          background: linear-gradient(90deg, #ff4500, #ff8c00);
+          color: white;
+          font-weight: 800;
+          font-size: 0.72rem;
+          padding: 4px 12px;
+          border-radius: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          box-shadow: 0 2px 8px rgba(255, 69, 0, 0.4);
+        }
+
+        .featured-content {
+          display: flex;
+          align-items: center;
+          gap: 1.8rem;
+          text-align: left;
+          flex: 1;
+        }
+
+        .featured-icon {
+          font-size: 4rem;
+          animation: bounceBeaker 2s ease-in-out infinite alternate;
+          filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.5));
+          display: inline-block;
+        }
+
+        .featured-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          max-width: 650px;
+        }
+
+        .featured-title {
+          font-size: 2.1rem;
+          font-weight: 850;
+          background: linear-gradient(to right, #ff8c00, #bc13fe);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          filter: drop-shadow(0 0 5px rgba(255, 140, 0, 0.15));
+          margin: 0;
+        }
+
+        .featured-desc {
+          font-size: 1.05rem;
+          color: #ccd1e0;
+          line-height: 1.5;
+          margin: 0;
+        }
+
+        .featured-play-btn {
+          background: linear-gradient(135deg, #ffa500, #ff5500);
+          color: white;
+          border: none;
+          padding: 12px 32px;
+          font-size: 1.15rem;
+          font-weight: 800;
+          border-radius: 30px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          white-space: nowrap;
+          box-shadow: 0 4px 15px rgba(255, 85, 0, 0.4);
+          margin-left: 1.5rem;
+        }
+
+        .featured-banner:hover .featured-play-btn {
+          background: linear-gradient(135deg, #bc13fe, #00f0ff);
+          box-shadow: 0 4px 20px rgba(188, 19, 254, 0.5);
+          transform: scale(1.05);
+        }
+
+        @keyframes bounceBeaker {
+          from { transform: translateY(0) rotate(0deg); }
+          to { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        @media (max-width: 768px) {
+          .featured-banner {
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+            padding: 2.5rem 1.5rem 1.5rem;
+          }
+          .featured-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+          }
+          .featured-play-btn {
+            margin-left: 0;
+            width: 100%;
+          }
+          .featured-badge {
+            position: absolute;
+            top: 10px;
+            right: 50%;
+            transform: translateX(50%);
+          }
+        }
+      `}</style>
+
       <div className="header-actions">
         {user ? (
           <>
@@ -362,6 +500,21 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
       </header>
 
       <main className="main-menu">
+        {/* Full-width Featured Banner: Plankton's Plan */}
+        <div className="featured-banner" onClick={() => handlePlayGame('planktonsteal')}>
+          <div className="featured-badge">🔥 Featured Release</div>
+          <div className="featured-content">
+            <span className="featured-icon">🧪</span>
+            <div className="featured-info">
+              <h2 className="featured-title">Plankton's Plan</h2>
+              <p className="featured-desc">
+                Help Sheldon J. Plankton steal the Krabby Patty secret formula in this fully animated adventure! Features real-time pitch-modulated speech audio.
+              </p>
+            </div>
+          </div>
+          <button className="featured-play-btn">Play Now</button>
+        </div>
+
         <div className="games-grid">
           {games.map((game) => (
             <GameCard
@@ -481,6 +634,7 @@ function App() {
       {view === 'memorymatch' && <MemoryMatch onBack={() => setView('menu')} />}
       {view === 'headortail' && <HeadOrTail onBack={() => setView('menu')} />}
       {view === 'f1reaction' && <F1Reaction onBack={() => setView('menu')} />}
+      {view === 'planktonsteal' && <PlanktonSteal onBack={() => setView('menu')} />}
     </>
   );
 }
