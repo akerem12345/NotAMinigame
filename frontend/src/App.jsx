@@ -508,7 +508,7 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
             <div className="featured-info">
               <h2 className="featured-title">Plankton's Plan</h2>
               <p className="featured-desc">
-                Help Sheldon J. Plankton steal the Krabby Patty secret formula in this fully animated adventure! Features real-time pitch-modulated speech audio.
+                Help Plankton steal the krabby patty formula and become the best chef in Bikini Bottom. Make the chum bucket best in the town.
               </p>
             </div>
           </div>
