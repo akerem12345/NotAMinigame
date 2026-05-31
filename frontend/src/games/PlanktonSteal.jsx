@@ -1168,7 +1168,7 @@ const PlanktonSteal = ({ onBack }) => {
           box-shadow: 0 6px 0 rgba(0,0,0,0.15);
         }
 
-        .kitchen-title-panel { display: flex; flex-direction: column; align-items: flex-start; }
+        .kitchen-title-panel { display: flex; flex-direction: column; align-items: flex-start; padding-left: 75px; }
         .kitchen-title-panel h2 { font-size: 1.6rem; color: #5d4037; font-weight: 900; margin: 0; text-shadow: 0 2px 0 rgba(255,255,255,0.6); }
         .kitchen-round-label { font-size: 0.92rem; color: #8d6e63; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -1711,7 +1711,7 @@ const PlanktonSteal = ({ onBack }) => {
             {customerSpeechVisible && (
               <div className="dialogue-bubble-container" onClick={handleCustomerSpeechClick}>
                 <div className={`speaker-badge speaker-${customerRound === 1 ? 'spongebob' : customerRound === 2 ? 'krabs' : 'plankton'}`}>
-                  {customerRound === 1 ? 'SpongeBob' : customerRound === 2 ? 'Mr. Krabs' : 'Plankton'}
+                  Customer
                 </div>
                 <div className="dialogue-text">
                   {displayText}
@@ -1742,7 +1742,7 @@ const PlanktonSteal = ({ onBack }) => {
             {/* Kitchen header HUD */}
             <div className="kitchen-header">
               <div className="kitchen-title-panel">
-                <h2>Krusty Krab Galley</h2>
+                <h2>Plankton's Kitchen</h2>
                 <div className="kitchen-round-label">Round {customerRound} of 3</div>
               </div>
 
@@ -1934,18 +1934,33 @@ const PlanktonSteal = ({ onBack }) => {
                     title="Pour Soda"
                   >
                     {drinkCup === 'none' && <span style={{ color: '#8d6e63', fontSize: '0.85rem', fontWeight: 'bold' }}>GRAB CUP STACK FIRST</span>}
-                    {drinkCup === 'empty' && <span style={{ color: '#5d4037', fontSize: '0.85rem', fontWeight: 'bold' }}>POUR SODA</span>}
+                    {drinkCup === 'empty' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <span style={{ fontSize: '2.8rem', filter: 'opacity(0.4)' }}>🥤</span>
+                        <span style={{ color: '#5d4037', fontSize: '0.78rem', fontWeight: 'bold', marginTop: '4px' }}>CLICK TO POUR SODA</span>
+                      </div>
+                    )}
                     {drinkCup === 'filling' && (
                       <>
                         <div className="pour-visual" />
-                        <div className="fryer-indicator">🥤</div>
-                        <span className="fry-label" style={{ background: '#ff3366', position: 'absolute', bottom: 10 }}>
+                        <div className="fryer-indicator" style={{ animation: 'sizzling 0.15s infinite' }}>🥤</div>
+                        <span className="fry-label" style={{ background: '#ff3366', position: 'absolute', bottom: 10, border: '2px solid #222' }}>
                           Pouring...
                         </span>
                       </>
                     )}
-                    {drinkCup === 'filled' && <span style={{ color: '#5d4037', fontSize: '0.85rem', fontWeight: 'bold' }}>ADD CAP & STRAW</span>}
-                    {drinkCup === 'completed' && <span style={{ color: '#4caf50', fontSize: '0.85rem', fontWeight: 'bold' }}>READY! PLACE ON TRAY</span>}
+                    {drinkCup === 'filled' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <span style={{ fontSize: '2.8rem' }}>🍹</span>
+                        <span style={{ color: '#5d4037', fontSize: '0.78rem', fontWeight: 'bold', marginTop: '4px' }}>ADD CAP & STRAW</span>
+                      </div>
+                    )}
+                    {drinkCup === 'completed' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <span style={{ fontSize: '2.8rem' }}>🥤</span>
+                        <span style={{ color: '#2e7d32', fontSize: '0.78rem', fontWeight: 'bold', marginTop: '4px' }}>READY! PLACE ON TRAY</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Cup and Lid Stackers */}
@@ -1992,31 +2007,33 @@ const PlanktonSteal = ({ onBack }) => {
 
                   {kitchenAlert && <div className="kitchen-alert-banner">{kitchenAlert}</div>}
 
-                  {/* Dump Tray items */}
-                  <div
-                    className="trash-can-station"
-                    onClick={() => {
-                      initAudio();
-                      playCookingSound('trash');
-                      setTrayItems({ burger: false, fries: false, drink: false });
-                      setKitchenAlert("Tray cleared!");
-                      setTimeout(() => setKitchenAlert(''), 2500);
-                    }}
-                    title="Dump everything on the tray"
+                  {/* Serve Button (Now inside the bench - extremely visible and central!) */}
+                  <button
+                    className="serve-btn"
+                    onClick={handleServe}
+                    disabled={!trayItems.burger && !trayItems.fries && !trayItems.drink}
+                    title="Serve tray to customer"
+                    style={{ marginTop: '1.2rem' }}
                   >
-                    🗑️ Dump Tray
-                  </div>
+                    🛎️ Serve Customer
+                  </button>
                 </div>
 
-                {/* Serve Button */}
-                <button
-                  className="serve-btn"
-                  onClick={handleServe}
-                  disabled={!trayItems.burger && !trayItems.fries && !trayItems.drink}
-                  title="Serve tray to customer"
+                {/* Dump Tray items (Now below the bench - smaller, secondary, and less dominant!) */}
+                <div
+                  className="trash-can-station"
+                  onClick={() => {
+                    initAudio();
+                    playCookingSound('trash');
+                    setTrayItems({ burger: false, fries: false, drink: false });
+                    setKitchenAlert("Tray cleared!");
+                    setTimeout(() => setKitchenAlert(''), 2500);
+                  }}
+                  title="Dump everything on the tray"
+                  style={{ height: '55px', fontSize: '1.2rem', fontWeight: '800' }}
                 >
-                  🛎️ Serve Customer
-                </button>
+                  🗑️ Dump Tray
+                </div>
               </div>
             </div>
           </>
