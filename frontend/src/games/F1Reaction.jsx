@@ -208,7 +208,10 @@ const F1Reaction = ({ onBack }) => {
       const goTimeout = setTimeout(() => {
         setCountdownStage(0); // Lights out!
         setGameState('go');
-        startTime.current = performance.now();
+        // Capture start time when the browser actually paints the updated lights-out screen
+        requestAnimationFrame(() => {
+          startTime.current = performance.now();
+        });
       }, randomDelay);
       
       timeouts.current.push(goTimeout);
@@ -361,7 +364,7 @@ const F1Reaction = ({ onBack }) => {
       {/* Big Clickable Area */}
       <div
         className={`f1-interactive-panel ${gameState === 'go' ? 'panel-go' : ''} ${gameState === 'ready' ? 'panel-ready' : ''} ${gameState === 'preparing' ? 'panel-preparing' : ''}`}
-        onClick={triggerReaction}
+        onPointerDown={triggerReaction}
       >
         {gameState === 'idle' && 'CLICK HERE OR PRESS SPACE BAR TO PREPARE'}
         {gameState === 'preparing' && 'LIGHTING UP GRID...'}

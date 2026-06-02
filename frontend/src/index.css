@@ -1313,7 +1313,7 @@ body {
   background: #151515;
   border: 2px solid #2a2a2a;
   box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
-  transition: all 0.1s ease;
+  /* Removed transition to prevent fade delays during state changes */
 }
 
 /* Light Active Glows */
@@ -1431,7 +1431,8 @@ body {
   font-weight: 800;
   cursor: pointer;
   box-shadow: var(--glass-shadow);
-  transition: all 0.2s ease;
+  /* Only transition background for hover effect; state changes (ready, preparing, go) must be instant */
+  transition: background 0.2s ease;
   user-select: none;
   text-align: center;
   padding: 1rem;
