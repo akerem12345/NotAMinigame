@@ -118,6 +118,7 @@ const PlanktonSteal = ({ onBack }) => {
     { id: 1, status: 'empty', progress: 0 },
     { id: 2, status: 'empty', progress: 0 }
   ]);
+  const [cookedPattiesCount, setCookedPattiesCount] = useState(0); // number of cooked patties in holding tray
   const [plateIngredients, setPlateIngredients] = useState([]); // Stack of currently placed toppings
   const [plateNotification, setPlateNotification] = useState(''); // validation alerts
 
@@ -459,6 +460,7 @@ const PlanktonSteal = ({ onBack }) => {
       { id: 1, status: 'empty', progress: 0 },
       { id: 2, status: 'empty', progress: 0 }
     ]);
+    setCookedPattiesCount(0);
     setPlateIngredients([]);
     setPlateNotification('');
     setFryerStatus('empty');
@@ -620,19 +622,13 @@ const PlanktonSteal = ({ onBack }) => {
       return;
     }
 
-    // Cooked patty placed on Assembly plate in sequence
-    const currentLength = plateIngredients.length;
-    if (currentLength !== 1) {
-      setPlateNotification("Burgers need a bottom bun before placing the cooked patty!");
-      setTimeout(() => setPlateNotification(''), 2500);
-      return;
-    }
-
-    setPlateIngredients((prev) => [...prev, 'cooked_patty']);
+    // Cooked patty moved to holding tray!
+    setCookedPattiesCount((prev) => prev + 1);
     setGrillPatties((prev) =>
       prev.map((p) => (p.id === slotId ? { ...p, status: 'empty', progress: 0 } : p))
     );
-    setPlateNotification("Cooked patty added to the plate!");
+    playCookingSound('ting');
+    setPlateNotification("Cooked patty moved to holding tray!");
     setTimeout(() => setPlateNotification(''), 2000);
   };
 
@@ -667,9 +663,21 @@ const PlanktonSteal = ({ onBack }) => {
       return;
     }
 
-    if (topping === 'raw_patty') {
-      setPlateNotification("Cook the patty on the grill first!");
-      setTimeout(() => setPlateNotification(''), 2500);
+    if (topping === 'cooked_patty') {
+      if (cookedPattiesCount <= 0) {
+        setPlateNotification("No cooked patties! Cook them on the grill first.");
+        setTimeout(() => setPlateNotification(''), 2500);
+        return;
+      }
+      if (currentLength !== 1) {
+        setPlateNotification("Burgers need a bottom bun before placing the cooked patty!");
+        setTimeout(() => setPlateNotification(''), 2500);
+        return;
+      }
+      setCookedPattiesCount((prev) => prev - 1);
+      setPlateIngredients((prev) => [...prev, 'cooked_patty']);
+      setPlateNotification("Cooked patty added to the plate!");
+      setTimeout(() => setPlateNotification(''), 2000);
       return;
     }
 
@@ -1250,6 +1258,67 @@ const PlanktonSteal = ({ onBack }) => {
 
         /* Grill Slots */
         .grill-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        
+        .holding-tray {
+          width: 100px;
+          height: 120px;
+          background: #d7ccc8; /* Warm clay plate color */
+          border: 4px solid #5d4037;
+          border-radius: 12px;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          box-shadow: inset 0 4px 6px rgba(0,0,0,0.15);
+          margin-left: auto;
+        }
+
+        .holding-tray-label {
+          font-size: 0.65rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          color: #5d4037;
+          position: absolute;
+          top: 6px;
+        }
+
+        .holding-tray-content {
+          position: relative;
+          width: 50px;
+          height: 50px;
+          margin-top: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .holding-patty {
+          font-size: 2.2rem;
+          position: absolute;
+          animation: breathing 2s ease-in-out infinite alternate;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+        }
+
+        .holding-tray-empty {
+          color: #8d6e63;
+          font-size: 0.72rem;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+
+        .holding-tray-count {
+          font-size: 0.8rem;
+          font-weight: 900;
+          color: white;
+          background: #4caf50;
+          border: 2px solid #5d4037;
+          border-radius: 8px;
+          padding: 2px 6px;
+          position: absolute;
+          bottom: 6px;
+        }
+
         .grill-slot {
           flex: 1;
           height: 120px;
@@ -1794,7 +1863,7 @@ const PlanktonSteal = ({ onBack }) => {
               <div className="kitchen-station-card station-burger">
                 <h3>🍔 Krabby Patty Galley</h3>
                 
-                {/* 2 Grill Slots */}
+                {/* 2 Grill Slots + Holding Tray */}
                 <div className="grill-row">
                   {grillPatties.map((patty) => (
                     <div
@@ -1826,6 +1895,29 @@ const PlanktonSteal = ({ onBack }) => {
                       )}
                     </div>
                   ))}
+
+                  {/* Cooked Patty Holding Tray */}
+                  <div className="holding-tray" title="Cooked Patty Warmer Tray">
+                    <span className="holding-tray-label">Holding Plate</span>
+                    <div className="holding-tray-content">
+                      {cookedPattiesCount > 0 ? (
+                        Array.from({ length: Math.min(cookedPattiesCount, 4) }).map((_, i) => (
+                          <div 
+                            key={i} 
+                            className="holding-patty" 
+                            style={{ bottom: `${i * 6}px` }}
+                          >
+                            🥩
+                          </div>
+                        ))
+                      ) : (
+                        <span className="holding-tray-empty">Empty</span>
+                      )}
+                    </div>
+                    {cookedPattiesCount > 0 && (
+                      <span className="holding-tray-count">x{cookedPattiesCount}</span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Toppings boxes */}
@@ -1834,9 +1926,9 @@ const PlanktonSteal = ({ onBack }) => {
                     <span className="topping-box-emoji">🥪</span>
                     <span>Bottom Bun</span>
                   </div>
-                  <div className="topping-box" onClick={() => handleAddTopping('raw_patty')}>
+                  <div className="topping-box" onClick={() => handleAddTopping('cooked_patty')}>
                     <span className="topping-box-emoji">🥩</span>
-                    <span>Raw Patty</span>
+                    <span>Cooked Patty</span>
                   </div>
                   <div className="topping-box" onClick={() => handleAddTopping('sliced_cheese')}>
                     <span className="topping-box-emoji">🧀</span>

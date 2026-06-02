@@ -10,6 +10,42 @@ import HeadOrTail from './games/HeadOrTail';
 import F1Reaction from './games/F1Reaction';
 import PlanktonSteal from './games/PlanktonSteal';
 
+const ACHIEVEMENTS = [
+  { id: 'play_dice', name: 'Dice Roller Beginner', desc: 'Played Dice Roller for the first time.', icon: '🎲' },
+  { id: 'play_tictactoe', name: 'Classic Duelist', desc: 'Played Tic Tac Toe for the first time.', icon: '❌' },
+  { id: 'play_hangman', name: 'Word Savior', desc: 'Played Hangman for the first time.', icon: '🪓' },
+  { id: 'play_memory', name: 'Brain Trainer', desc: 'Played Memory Match for the first time.', icon: '🧠' },
+  { id: 'play_headortail', name: 'Coin Flipper', desc: 'Played Head or Tail for the first time.', icon: '🪙' },
+  { id: 'play_f1', name: 'Reaction Racer', desc: 'Played F1 Start Reaction for the first time.', icon: '🏎️' },
+  { id: 'play_plankton', name: 'Chum Bucket Helper', desc: 'Played Plankton\'s Plan for the first time.', icon: '🍔' },
+];
+
+const getUnlockedAchievements = (user) => {
+  const key = `notaminigame_achievements_${user?.id || 'guest'}`;
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    return [];
+  }
+};
+
+const unlockAchievement = (user, achievementId) => {
+  const key = `notaminigame_achievements_${user?.id || 'guest'}`;
+  try {
+    const data = localStorage.getItem(key);
+    const list = data ? JSON.parse(data) : [];
+    if (!list.includes(achievementId)) {
+      list.push(achievementId);
+      localStorage.setItem(key, JSON.stringify(list));
+      return true;
+    }
+  } catch (e) {
+    console.error("Failed to unlock achievement", e);
+  }
+  return false;
+};
+
 const GameCard = ({ icon, title, desc, onPlay }) => {
   return (
     <div className="game-card" onClick={onPlay}>
@@ -191,6 +227,8 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
   const [bannerColor1, setBannerColor1] = useState(user?.bannerhex_1 || '#bc13fe');
   const [bannerColor2, setBannerColor2] = useState(user?.bannerhex_2 || '#00f0ff');
 
+  const unlockedList = getUnlockedAchievements(user);
+
   const handleBack = async () => {
     if (user && user.id) {
       try {
@@ -267,6 +305,7 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
           />
         </div>
         <h3 className="profile-username">{user?.username || 'Guest'}</h3>
+        
         <div className="profile-scores-container" style={{ marginTop: '1rem', width: '100%', padding: '0 2rem', boxSizing: 'border-box' }}>
           <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' }}>
             <span>Hangman:</span> <span style={{ color: 'var(--secondary-neon)' }}>{user?.hangmanScore || 0}</span>
@@ -285,6 +324,34 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
           </div>
           <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0' }}>
             <span>F1 Start Reaction:</span> <span style={{ color: '#ff3366' }}>{user?.f1ReactionScore || 0} pts</span>
+          </div>
+        </div>
+
+        {/* Achievements Section */}
+        <div className="profile-achievements-section">
+          <h4 className="achievements-title">Achievements</h4>
+          <div className="achievements-count">
+            {unlockedList.length} / {ACHIEVEMENTS.length} Unlocked
+          </div>
+          <div className="achievements-grid">
+            {ACHIEVEMENTS.map((ach) => {
+              const isUnlocked = unlockedList.includes(ach.id);
+              return (
+                <div 
+                  key={ach.id} 
+                  className={`achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`}
+                >
+                  <span className="achievement-icon">{ach.icon}</span>
+                  <div className="achievement-tooltip">
+                    <div className="achievement-tooltip-name">{ach.name}</div>
+                    <div className="achievement-tooltip-desc">{ach.desc}</div>
+                    <div className={`achievement-tooltip-status ${isUnlocked ? 'unlocked' : 'locked'}`}>
+                      {isUnlocked ? 'Unlocked' : 'Locked'}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -626,7 +693,22 @@ function App() {
           }
         }
         setView('profile');
-      }} onLogout={handleLogout} onPlay={setView} />}
+      }} onLogout={handleLogout} onPlay={(gameView) => {
+        const achievementMap = {
+          'diceroller': 'play_dice',
+          'tictactoe': 'play_tictactoe',
+          'hangman': 'play_hangman',
+          'memorymatch': 'play_memory',
+          'headortail': 'play_headortail',
+          'f1reaction': 'play_f1',
+          'planktonsteal': 'play_plankton'
+        };
+        const achId = achievementMap[gameView];
+        if (achId) {
+          unlockAchievement(user, achId);
+        }
+        setView(gameView);
+      }} />}
       {view === 'profile' && <ProfileScreen user={user} onUserUpdate={setUser} onBack={() => setView('menu')} />}
 
       {/* Games */}
