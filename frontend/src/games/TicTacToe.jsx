@@ -80,7 +80,7 @@ const playSound = (type) => {
   }
 };
 
-const TicTacToe = ({ onBack }) => {
+const TicTacToe = ({ onBack, onUnlockAchievement }) => {
   const [gameMode, setGameMode] = useState(null); // 'coop' or 'bot'
   const [board, setBoard] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
@@ -117,6 +117,9 @@ const TicTacToe = ({ onBack }) => {
     if (newWinner) {
       setWinner(newWinner);
       playSound('win');
+      if (gameMode === 'bot' && newWinner === 'X' && onUnlockAchievement) {
+        onUnlockAchievement('tictactoe_win_ai');
+      }
       await saveScore(newWinner);
     } else if (!newBoard.includes(null)) {
       setWinner('Draw');
@@ -145,6 +148,9 @@ const TicTacToe = ({ onBack }) => {
           if (newWinner) {
             setWinner(newWinner);
             playSound('win');
+            if (onUnlockAchievement) {
+              onUnlockAchievement('tictactoe_lose_ai');
+            }
             saveScore(newWinner);
           } else if (!newBoard.includes(null)) {
             setWinner('Draw');

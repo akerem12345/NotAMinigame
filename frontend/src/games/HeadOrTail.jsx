@@ -60,7 +60,7 @@ const playSound = (type) => {
   }
 };
 
-const HeadOrTail = ({ onBack }) => {
+const HeadOrTail = ({ onBack, onUnlockAchievement }) => {
   const [prediction, setPrediction] = useState(null); // 'heads' | 'tails'
   const [isFlipping, setIsFlipping] = useState(false);
   const [outcome, setOutcome] = useState(null); // 'heads' | 'tails'
@@ -117,6 +117,10 @@ const HeadOrTail = ({ onBack }) => {
         // Calculate points (10 base + streak bonus)
         const nextStreak = currentStreak + 1;
         setCurrentStreak(nextStreak);
+        
+        if (nextStreak >= 5 && onUnlockAchievement) {
+          onUnlockAchievement('coin_streak_5');
+        }
         
         let streakBonus = 0;
         if (nextStreak >= 5) {

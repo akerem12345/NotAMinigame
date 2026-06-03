@@ -2056,4 +2056,115 @@ body {
   text-shadow: 0 0 5px rgba(255, 51, 102, 0.4);
 }
 
+/* Achievement Toast Notification */
+.achievement-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(15, 12, 41, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid var(--accent-neon);
+  box-shadow: 0 10px 40px rgba(57, 255, 20, 0.25), 0 0 20px rgba(57, 255, 20, 0.15);
+  border-radius: 16px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10000;
+  max-width: 450px;
+  width: calc(100% - 40px);
+  box-sizing: border-box;
+  animation: toastSlideInOut 3s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+.achievement-toast-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  animation: toastIconBounce 1.5s ease-in-out infinite alternate;
+}
+
+.achievement-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.achievement-toast-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent-neon);
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+}
+
+.achievement-toast-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+@keyframes toastSlideInOut {
+  0% {
+    transform: translateX(-50%) translateY(100px);
+    opacity: 0;
+  }
+  10% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  90% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(100px);
+    opacity: 0;
+  }
+}
+
+@keyframes toastIconBounce {
+  0% {
+    transform: scale(0.9) rotate(-5deg);
+  }
+  100% {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+/* Reset Profile Button */
+.reset-profile-btn {
+  margin-top: 2rem;
+  background: transparent;
+  color: #ff3366;
+  border: 2px solid #ff3366;
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 10px rgba(255, 51, 102, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reset-profile-btn:hover {
+  background: #ff3366;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255, 51, 102, 0.6);
+  transform: translateY(-2px);
+}
+
+.reset-profile-btn:active {
+  transform: translateY(0);
+}
+
 

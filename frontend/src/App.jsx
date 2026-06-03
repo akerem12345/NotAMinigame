@@ -11,13 +11,30 @@ import F1Reaction from './games/F1Reaction';
 import PlanktonSteal from './games/PlanktonSteal';
 
 const ACHIEVEMENTS = [
-  { id: 'play_dice', name: 'Dice Roller Beginner', desc: 'Played Dice Roller for the first time.', icon: '🎲' },
-  { id: 'play_tictactoe', name: 'Classic Duelist', desc: 'Played Tic Tac Toe for the first time.', icon: '❌' },
-  { id: 'play_hangman', name: 'Word Savior', desc: 'Played Hangman for the first time.', icon: '🪓' },
-  { id: 'play_memory', name: 'Brain Trainer', desc: 'Played Memory Match for the first time.', icon: '🧠' },
-  { id: 'play_headortail', name: 'Coin Flipper', desc: 'Played Head or Tail for the first time.', icon: '🪙' },
-  { id: 'play_f1', name: 'Reaction Racer', desc: 'Played F1 Start Reaction for the first time.', icon: '🏎️' },
-  { id: 'play_plankton', name: 'Chum Bucket Helper', desc: 'Played Plankton\'s Plan for the first time.', icon: '🍔' },
+  { id: 'play_dice', name: 'We gave 100k for two dice, at least we decrease from the dice brother', desc: 'Played Dice Roller for the first time.', icon: '🎲' },
+  { id: 'play_tictactoe', name: 'Tripple T', desc: 'Played Tic Tac Toe for the first time.', icon: '❌' },
+  { id: 'play_hangman', name: 'Couldn\'t effort the guillotine', desc: 'Played Hangman for the first time.', icon: '🪓' },
+  { id: 'play_memory', name: 'Train Brain', desc: 'Played Memory Match for the first time.', icon: '🧠' },
+  { id: 'play_headortail', name: '50:50', desc: 'Played Head or Tail for the first time.', icon: '🪙' },
+  { id: 'play_f1', name: 'Welcome to the Radiator Springs', desc: 'Played F1 Start Reaction for the first time.', icon: '🏎️' },
+  { id: 'play_plankton', name: 'How the tables have turned', desc: 'Played Plankton\'s Plan for the first time.', icon: '🍔' },
+  { id: 'dice_five_sixes', name: 'Vegas con master', desc: 'throw 5 dices and they all are 6.', icon: '🎰' },
+  { id: 'f1_best_of_best', name: 'Best of the best', desc: 'Hold the record of the racer leaderboard.', icon: '🏆' },
+  { id: 'f1_under_200', name: 'I am speed', desc: 'Beat the 200 ms in the reaction test.', icon: '⚡' },
+  { id: 'dice_same_twice', name: 'Double Nickel', desc: `"If I had a nickel for every time I rolled same dice twice, I'd have two nickels. Which isn't a lot, but it's weird that it happened twice". Throw the same dice in a row.`, icon: '🪙' },
+  { id: 'plankton_win', name: "'Chum'pion of the burgers", desc: 'Complete the Plankton\'s plan game.', icon: '👑' },
+  { id: 'plankton_wrong_order', name: 'At least better than chineese', desc: 'Give a wrong order to a customer in Planktons plan.', icon: '🤮' },
+  { id: 'coin_streak_5', name: 'What are the odds', desc: 'Have a streak of 5 in a row in coin toss.', icon: '📈' },
+  { id: 'hangman_lose', name: 'Down with the king!', desc: 'Hang the man in the hangman.', icon: '💀' },
+  { id: 'tictactoe_win_ai', name: 'Mommy look, I won', desc: 'Won a match against ai in tic tac toe.', icon: '👶' },
+  { id: 'secret_marines', name: 'Just like the US marines', desc: 'Find the Saddam Hussein hiding spot in the main menu.', icon: '🎖️', secret: true },
+  { id: 'press_f', name: 'F', desc: 'Press F to pay respect.', icon: '🫡' },
+  { id: 'customize_banner', name: 'Pimp my ride', desc: 'Customize your banner.', icon: '🎨' },
+  { id: 'banner_pitch_black', name: 'Dark as night...', desc: 'Make both banner colors pitch black', icon: '🖤', secret: true },
+  { id: 'banner_pitch_white', name: '...Light as the day', desc: 'Make both banner colors pitch white', icon: '🤍', secret: true },
+  { id: 'f1_wait_10s', name: 'Internet Explorer', desc: 'In the f1 racer wait \'till 10 seconds.', icon: '🐌', secret: true },
+  { id: 'tictactoe_lose_ai', name: 'AI overtake', desc: 'Lose a tic tac toe match against the computer.', icon: '🤖' },
+  { id: 'hangman_pacifist', name: 'Pacifist', desc: 'Make no mistakes in the hangman.', icon: '🕊️' }
 ];
 
 const getUnlockedAchievements = (user) => {
@@ -44,6 +61,38 @@ const unlockAchievement = (user, achievementId) => {
     console.error("Failed to unlock achievement", e);
   }
   return false;
+};
+
+const playAchievementUnlockSound = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    
+    // Play a shiny 4-note retro arpeggio: C5 -> E5 -> G5 -> C6
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
+      
+      // Slight pitch slide for a retro game feel
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.05, ctx.currentTime + idx * 0.1 + 0.15);
+      
+      gain.gain.setValueAtTime(0, ctx.currentTime + idx * 0.1);
+      gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + idx * 0.1 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.1 + 0.25);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.start(ctx.currentTime + idx * 0.1);
+      osc.stop(ctx.currentTime + idx * 0.1 + 0.3);
+    });
+  } catch (e) {
+    console.warn("Failed to play achievement sound:", e);
+  }
 };
 
 const GameCard = ({ icon, title, desc, onPlay }) => {
@@ -222,12 +271,71 @@ const Gateway = ({ onAuthSuccess, onGuest }) => {
 };
 
 // --- View 4: Profile Screen Component ---
-const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
+const ProfileScreen = ({ user, onUserUpdate, onBack, onUnlockAchievement }) => {
   const [avatarColor, setAvatarColor] = useState(user?.pphex || '#bc13fe');
   const [bannerColor1, setBannerColor1] = useState(user?.bannerhex_1 || '#bc13fe');
   const [bannerColor2, setBannerColor2] = useState(user?.bannerhex_2 || '#00f0ff');
+  const [unlockedList, setUnlockedList] = useState(getUnlockedAchievements(user));
 
-  const unlockedList = getUnlockedAchievements(user);
+  const initialBannerColor1 = React.useRef(user?.bannerhex_1 || '#bc13fe');
+  const initialBannerColor2 = React.useRef(user?.bannerhex_2 || '#00f0ff');
+
+  useEffect(() => {
+    setUnlockedList(getUnlockedAchievements(user));
+  }, [user]);
+
+  useEffect(() => {
+    if (bannerColor1 !== initialBannerColor1.current || bannerColor2 !== initialBannerColor2.current) {
+      if (onUnlockAchievement) {
+        onUnlockAchievement('customize_banner');
+      }
+    }
+    const c1 = bannerColor1.toLowerCase();
+    const c2 = bannerColor2.toLowerCase();
+    if (c1 === '#000000' && c2 === '#000000') {
+      if (onUnlockAchievement) {
+        onUnlockAchievement('banner_pitch_black');
+      }
+    }
+    if (c1 === '#ffffff' && c2 === '#ffffff') {
+      if (onUnlockAchievement) {
+        onUnlockAchievement('banner_pitch_white');
+      }
+    }
+  }, [bannerColor1, bannerColor2, onUnlockAchievement]);
+
+  const handleResetProfile = async () => {
+    if (!window.confirm("Are you sure you want to reset all scores, personal bests, and achievements? This cannot be undone!")) {
+      return;
+    }
+
+    const userIdKey = user?.id || 'guest';
+    localStorage.removeItem(`notaminigame_achievements_${userIdKey}`);
+    localStorage.removeItem('f1reaction_pb');
+    localStorage.removeItem('headortail_highstreak');
+    setUnlockedList([]);
+
+    if (user && user.id) {
+      try {
+        const updatedProfile = await apiFetch(`/users/${user.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            hangmanScore: 0,
+            memoryMatchCountdownScore: 0,
+            memoryMatchTimeChallengeScore: 0,
+            tictactoeScore: 0,
+            headOrTailScore: 0,
+            f1ReactionScore: 0
+          })
+        });
+        onUserUpdate(updatedProfile);
+      } catch (e) {
+        console.error("Failed to reset scores on backend", e);
+      }
+    } else {
+      onUserUpdate(null);
+    }
+  };
 
   const handleBack = async () => {
     if (user && user.id) {
@@ -305,7 +413,7 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
           />
         </div>
         <h3 className="profile-username">{user?.username || 'Guest'}</h3>
-        
+
         <div className="profile-scores-container" style={{ marginTop: '1rem', width: '100%', padding: '0 2rem', boxSizing: 'border-box' }}>
           <div className="profile-score" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' }}>
             <span>Hangman:</span> <span style={{ color: 'var(--secondary-neon)' }}>{user?.hangmanScore || 0}</span>
@@ -336,15 +444,17 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
           <div className="achievements-grid">
             {ACHIEVEMENTS.map((ach) => {
               const isUnlocked = unlockedList.includes(ach.id);
+              const isSecret = ach.secret && !isUnlocked;
+              const displayDesc = isSecret ? "Secret Achievement" : ach.desc;
               return (
-                <div 
-                  key={ach.id} 
+                <div
+                  key={ach.id}
                   className={`achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`}
                 >
-                  <span className="achievement-icon">{ach.icon}</span>
+                  <span className="achievement-icon">{isSecret ? '❓' : ach.icon}</span>
                   <div className="achievement-tooltip">
                     <div className="achievement-tooltip-name">{ach.name}</div>
-                    <div className="achievement-tooltip-desc">{ach.desc}</div>
+                    <div className="achievement-tooltip-desc">{displayDesc}</div>
                     <div className={`achievement-tooltip-status ${isUnlocked ? 'unlocked' : 'locked'}`}>
                       {isUnlocked ? 'Unlocked' : 'Locked'}
                     </div>
@@ -354,13 +464,22 @@ const ProfileScreen = ({ user, onUserUpdate, onBack }) => {
             })}
           </div>
         </div>
+
+        {/* Reset Profile Button */}
+        <button 
+          className="reset-profile-btn" 
+          onClick={handleResetProfile}
+          title="Reset all scores, achievements, and statistics"
+        >
+          ⚠️ Reset stats
+        </button>
       </div>
     </div>
   );
 };
 
 // --- View 3: Main Menu Component ---
-const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
+const MainMenu = ({ user, onProfile, onLogout, onPlay, onUnlockAchievement }) => {
   const [showSdmMsg, setShowSdmMsg] = useState(false);
 
   const games = [
@@ -571,7 +690,7 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
       <main className="main-menu">
         {/* Full-width Featured Banner: Plankton's Plan */}
         <div className="featured-banner" onClick={() => handlePlayGame('planktonsteal')}>
-          <div className="featured-badge">🔥 Featured Release</div>
+          <div className="featured-badge">NotAMinigame Exclusive</div>
           <div className="featured-content">
             <img src="/resources/images/planktonmenu.png" alt="Plankton Logo" className="featured-logo" />
             <div className="featured-info">
@@ -604,7 +723,12 @@ const MainMenu = ({ user, onProfile, onLogout, onPlay }) => {
           width="144"
           height="24"
           style={{ cursor: 'pointer' }}
-          onClick={() => setShowSdmMsg(!showSdmMsg)}
+          onClick={() => {
+            setShowSdmMsg(!showSdmMsg);
+            if (onUnlockAchievement) {
+              onUnlockAchievement('secret_marines');
+            }
+          }}
         />
         {showSdmMsg && (
           <div style={{
@@ -646,6 +770,41 @@ function App() {
   const [view, setView] = useState('splash');
   const [user, setUser] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [activeToast, setActiveToast] = useState(null);
+
+  const handleUnlock = (achId) => {
+    const newlyUnlocked = unlockAchievement(user, achId);
+    if (newlyUnlocked) {
+      const ach = ACHIEVEMENTS.find(a => a.id === achId);
+      if (ach) {
+        setActiveToast(ach);
+        playAchievementUnlockSound();
+        
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+          setActiveToast((prev) => (prev?.id === achId ? null : prev));
+        }, 3000);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'f' || e.key === 'F') {
+        if (view === 'menu' || view === 'profile') {
+          const activeEl = document.activeElement;
+          if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+            return;
+          }
+          handleUnlock('press_f');
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [view, user]);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -693,7 +852,7 @@ function App() {
           }
         }
         setView('profile');
-      }} onLogout={handleLogout} onPlay={(gameView) => {
+      }} onLogout={handleLogout} onUnlockAchievement={handleUnlock} onPlay={(gameView) => {
         const achievementMap = {
           'diceroller': 'play_dice',
           'tictactoe': 'play_tictactoe',
@@ -705,20 +864,31 @@ function App() {
         };
         const achId = achievementMap[gameView];
         if (achId) {
-          unlockAchievement(user, achId);
+          handleUnlock(achId);
         }
         setView(gameView);
       }} />}
-      {view === 'profile' && <ProfileScreen user={user} onUserUpdate={setUser} onBack={() => setView('menu')} />}
+      {view === 'profile' && <ProfileScreen user={user} onUserUpdate={setUser} onBack={() => setView('menu')} onUnlockAchievement={handleUnlock} />}
 
       {/* Games */}
-      {view === 'diceroller' && <DiceRoller onBack={() => setView('menu')} />}
-      {view === 'tictactoe' && <TicTacToe onBack={() => setView('menu')} />}
-      {view === 'hangman' && <Hangman onBack={() => setView('menu')} />}
-      {view === 'memorymatch' && <MemoryMatch onBack={() => setView('menu')} />}
-      {view === 'headortail' && <HeadOrTail onBack={() => setView('menu')} />}
-      {view === 'f1reaction' && <F1Reaction onBack={() => setView('menu')} />}
-      {view === 'planktonsteal' && <PlanktonSteal onBack={() => setView('menu')} />}
+      {view === 'diceroller' && <DiceRoller onBack={() => setView('menu')} onUnlockAchievement={handleUnlock} />}
+      {view === 'tictactoe' && <TicTacToe onBack={() => setView('menu')} onUnlockAchievement={handleUnlock} />}
+      {view === 'hangman' && <Hangman onBack={() => setView('menu')} onUnlockAchievement={handleUnlock} />}
+      {view === 'memorymatch' && <MemoryMatch onBack={() => setView('menu')} onUnlockAchievement={handleUnlock} />}
+      {view === 'headortail' && <HeadOrTail onBack={() => setView('menu')} onUnlockAchievement={handleUnlock} />}
+      {view === 'f1reaction' && <F1Reaction onBack={() => setView('menu')} onUnlockAchievement={handleUnlock} />}
+      {view === 'planktonsteal' && <PlanktonSteal onBack={() => setView('menu')} onUnlockAchievement={handleUnlock} />}
+
+      {/* Toast Notification */}
+      {activeToast && (
+        <div className="achievement-toast">
+          <div className="achievement-toast-icon">{activeToast.icon}</div>
+          <div className="achievement-toast-content">
+            <div className="achievement-toast-title">Achievement Unlocked!</div>
+            <div className="achievement-toast-name">{activeToast.name}</div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

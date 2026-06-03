@@ -73,7 +73,7 @@ const playSpeechBlip = (char, speaker) => {
   }
 };
 
-const PlanktonSteal = ({ onBack }) => {
+const PlanktonSteal = ({ onBack, onUnlockAchievement }) => {
   // Game screen scenes: 'start', 'scene-1', 'scene-2', 'counter-active', 'kitchen-active', 'game-over'
   const [scene, setScene] = useState('start');
   const [isFading, setIsFading] = useState(false);
@@ -439,6 +439,9 @@ const PlanktonSteal = ({ onBack }) => {
       triggerBubbleTransition(() => {
         if (customerRound === 3) {
           setScene('game-over');
+          if (onUnlockAchievement) {
+            onUnlockAchievement('plankton_win');
+          }
         } else {
           startCustomerRound(customerRound + 1);
         }
@@ -877,6 +880,9 @@ const PlanktonSteal = ({ onBack }) => {
       } else {
         logsText = `Customer ${customerRound} left! Mismatched tray items. (0 pts)`;
         outcome = 'mismatch';
+        if (onUnlockAchievement) {
+          onUnlockAchievement('plankton_wrong_order');
+        }
       }
 
       // Sad buzz sound
@@ -1744,8 +1750,9 @@ const PlanktonSteal = ({ onBack }) => {
           <div className="start-screen-panel">
             <h1 className="start-title">Plankton's Plan</h1>
             <p className="start-subtitle">
-              He has planned this for years. Help Sheldon J. Plankton steal the secret Krabby Patty formula and escape the Krusty Krab!
+              Plankton has been planning to steal the secret formula of the krabby patties. Help plankton to overthrow the krusty crab and make the Chum Bucket number one with your extensive cooking skills.
             </p>
+            <h2>Say my name...</h2><br></br>
             <button className="orange-start-btn" onClick={handleStartGame}>
               Start Mission
             </button>

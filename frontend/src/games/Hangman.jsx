@@ -103,7 +103,7 @@ const HangmanDrawing = ({ mistakes }) => {
   );
 };
 
-const Hangman = ({ onBack }) => {
+const Hangman = ({ onBack, onUnlockAchievement }) => {
   const [category, setCategory] = useState(null);
   const [word, setWord] = useState('');
   const [guessedLetters, setGuessedLetters] = useState(new Set());
@@ -116,8 +116,10 @@ const Hangman = ({ onBack }) => {
     playSound('click');
     const wordsPool = CATEGORIES[selectedCat];
     const randomIndex = Math.floor(Math.random() * wordsPool.length);
+    const chosenWord = wordsPool[randomIndex];
     setCategory(selectedCat);
-    setWord(wordsPool[randomIndex]);
+    setWord(chosenWord);
+    window.currentHangmanWord = chosenWord;
     setGuessedLetters(new Set());
     setMistakes(0);
     setIsWinner(false);
@@ -148,10 +150,16 @@ const Hangman = ({ onBack }) => {
       playSound('win');
       // Score based on word length and remaining lives
       const score = (word.length * 10) + ((maxMistakes - currentMistakes) * 15);
+      if (currentMistakes === 0 && onUnlockAchievement) {
+        onUnlockAchievement('hangman_pacifist');
+      }
       await saveScore(score);
     } else if (currentMistakes >= maxMistakes) {
       setIsLoser(true);
       playSound('lose');
+      if (onUnlockAchievement) {
+        onUnlockAchievement('hangman_lose');
+      }
     }
   }, [guessedLetters, isWinner, isLoser, word, mistakes]);
 

@@ -112,6 +112,12 @@ public class UserController {
         if (dto.getPphex() != null) user.setPphex(dto.getPphex());
         if (dto.getBannerhex_1() != null) user.setBannerhex_1(dto.getBannerhex_1());
         if (dto.getBannerhex_2() != null) user.setBannerhex_2(dto.getBannerhex_2());
+        if (dto.getHangmanScore() != null) user.setHangmanScore(dto.getHangmanScore());
+        if (dto.getMemoryMatchCountdownScore() != null) user.setMemoryMatchCountdownScore(dto.getMemoryMatchCountdownScore());
+        if (dto.getMemoryMatchTimeChallengeScore() != null) user.setMemoryMatchTimeChallengeScore(dto.getMemoryMatchTimeChallengeScore());
+        if (dto.getTictactoeScore() != null) user.setTictactoeScore(dto.getTictactoeScore());
+        if (dto.getHeadOrTailScore() != null) user.setHeadOrTailScore(dto.getHeadOrTailScore());
+        if (dto.getF1ReactionScore() != null) user.setF1ReactionScore(dto.getF1ReactionScore());
 
         User saved = userRepository.save(user);
         UserProfileDto response = new UserProfileDto(

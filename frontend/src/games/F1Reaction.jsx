@@ -108,7 +108,7 @@ const PILOT_BENCHMARKS = [
   { name: 'Average Human', time: 250, desc: 'Casual reaction benchmark' }
 ];
 
-const F1Reaction = ({ onBack }) => {
+const F1Reaction = ({ onBack, onUnlockAchievement }) => {
   // 'idle' | 'preparing' | 'ready' | 'go' | 'result' | 'jump'
   const [gameState, setGameState] = useState('idle');
   const [countdownStage, setCountdownStage] = useState(0); // 0 (off), 1 (orange), 2 (green), 3 (red 1), 4 (red 2)
@@ -149,6 +149,18 @@ const F1Reaction = ({ onBack }) => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [gameState]);
+
+  // Monitor waiting for 10 seconds after lights out for "Internet Explorer" achievement
+  useEffect(() => {
+    if (gameState === 'go') {
+      const timer = setTimeout(() => {
+        if (onUnlockAchievement) {
+          onUnlockAchievement('f1_wait_10s');
+        }
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [gameState, onUnlockAchievement]);
 
   // Orange blinking animation for idle and jump states
   useEffect(() => {
@@ -245,6 +257,18 @@ const F1Reaction = ({ onBack }) => {
       const finalTime = Math.round(now - startTime.current);
       setReactionTime(finalTime);
       setGameState('result');
+
+      if (onUnlockAchievement) {
+        if (finalTime < 200) {
+          onUnlockAchievement('f1_under_200');
+        }
+        if (finalTime <= 104) {
+          onUnlockAchievement('f1_best_of_best');
+        }
+        if (finalTime >= 10000) {
+          onUnlockAchievement('f1_wait_10s');
+        }
+      }
       
       // Play F1 engine sound and move car
       playF1Engine();

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { submitScore } from '../api';
 import '../index.css';
 
-const DiceRoller = ({ onBack }) => {
+const DiceRoller = ({ onBack, onUnlockAchievement }) => {
   const [diceCount, setDiceCount] = useState(2); // Start with 2 dice for a richer default view
+  const [previousRoll, setPreviousRoll] = useState(null);
   const [diceType, setDiceType] = useState(6);
   const [results, setResults] = useState([]);
   const [tempResults, setTempResults] = useState([]);
@@ -51,6 +52,21 @@ const DiceRoller = ({ onBack }) => {
       setTimeout(async () => {
         setResults(newResults);
         setGameState('results');
+
+        if (onUnlockAchievement) {
+          if (diceCount === 5 && newResults.every(val => val === 6)) {
+            onUnlockAchievement('dice_five_sixes');
+          }
+          if (previousRoll && previousRoll.length === newResults.length) {
+            const sortedCurrent = [...newResults].sort((a, b) => a - b);
+            const sortedPrev = [...previousRoll].sort((a, b) => a - b);
+            const isSame = sortedCurrent.every((val, idx) => val === sortedPrev[idx]);
+            if (isSame) {
+              onUnlockAchievement('dice_same_twice');
+            }
+          }
+        }
+        setPreviousRoll(newResults);
 
         if (percentage > 70) {
           const lp = Math.floor(percentage);
